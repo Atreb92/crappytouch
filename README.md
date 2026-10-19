@@ -86,5 +86,8 @@ Logs: `idevicesyslog -m scrcrappy-agent`.
 
 ## Licence
 
-MIT. The touch-injection technique (IOHIDEvent digitizer events dispatched in SpringBoard) is
-reimplemented; no ZXTouch code is used.
+MIT.
+
+Credit to ZXTouch: it showed the way to inject touches on a jailbroken iPhone (IOHIDEvent digitizer
+events dispatched in SpringBoard). scrcrappy-agent follows the same technique as a clean rewrite and
+contains none of its (GPLv3) code.
