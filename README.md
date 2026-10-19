@@ -56,8 +56,11 @@ examples — and the reference client `client/agent_client.py` (Python stdlib).
 ```sh
 sudo dnf install -y fakeroot perl rsync zip git xz
 scripts/setup-theos.sh      # Theos + iOS toolchain + iOS 16.5 SDK into ~/theos
-make package                # packages/dev.scrcrappy.agent_*_iphoneos-arm64.deb (arm64 + arm64e)
+make package                # debug build: packages/dev.scrcrappy.agent_<version>-<n>+debug_iphoneos-arm64.deb
+make package FINALPACKAGE=1 # release build (optimized, stripped): dev.scrcrappy.agent_<version>_iphoneos-arm64.deb
 ```
+
+Both contain arm64 and arm64e.
 
 ## Install on the phone
 
