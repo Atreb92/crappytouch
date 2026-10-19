@@ -4,12 +4,15 @@
 #import <rootless.h>
 #import <string.h>
 
-static NSString *StateDir(void) {
-    return ROOT_PATH_NS(@"/var/mobile/Library/scrcrappy-agent");
+NSString *SAStatePath(NSString *file) {
+    NSString *dir = ROOT_PATH_NS(@"/var/mobile/Library/scrcrappy-agent");
+    [NSFileManager.defaultManager createDirectoryAtPath:dir withIntermediateDirectories:YES
+                                             attributes:@{NSFilePosixPermissions: @0700} error:NULL];
+    return [dir stringByAppendingPathComponent:file];
 }
 
 static NSString *HostsPath(void) {
-    return [StateDir() stringByAppendingPathComponent:@"hosts.plist"];
+    return SAStatePath(@"hosts.plist");
 }
 
 static NSData *SHA256WithPrefix(NSString *prefix, NSData *secret) {
@@ -62,14 +65,11 @@ SAAuthResult SAAuthCheck(NSString *hostID, NSString *mac, NSData *nonce) {
 }
 
 BOOL SAAuthAddHost(NSString *name, NSData *secret) {
-    NSFileManager *fm = NSFileManager.defaultManager;
-    if (![fm createDirectoryAtPath:StateDir() withIntermediateDirectories:YES
-                        attributes:@{NSFilePosixPermissions: @0700} error:NULL]) return NO;
     NSMutableDictionary *hosts = [[NSDictionary dictionaryWithContentsOfFile:HostsPath()] mutableCopy]
                                  ?: [NSMutableDictionary dictionary];
     hosts[SAHex(SHA256WithPrefix(@"scrcrappy-id", secret))] =
         @{@"name": name, @"key": SHA256WithPrefix(@"scrcrappy-key", secret)};
     NSURL *url = [NSURL fileURLWithPath:HostsPath()];
     return [hosts writeToURL:url error:NULL] &&
-           [fm setAttributes:@{NSFilePosixPermissions: @0600} ofItemAtPath:HostsPath() error:NULL];
+           [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: @0600} ofItemAtPath:HostsPath() error:NULL];
 }

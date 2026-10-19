@@ -6,11 +6,11 @@
 - `{"cmd":"auth","host":"<name>","id":"<hex id>","mac":"<hex HMAC-SHA256(key, nonce bytes)>"}` (id / key derived as in Global Constraints) → `{"ok":true}` | `{"error":"unknown host"}` | `{"error":"bad mac"}`; a failed auth closes the connection (one try per nonce).
 - `{"cmd":"pair","host":"<name>","secret":"<64 hex>"}` → alert "Allow ‹name› to control this iPhone? Code ‹code›"; `code` = first 3 bytes of sha256(secret) as int % 1 000 000, zero-padded 6 digits → `{"ok":true}` | `{"error":"denied"}` (Deny or 30 s) | `{"error":"busy"}` (another pairing pending) | `{"error":"locked"}` (phone locked: unlock it first, no alert is shown) | `{"error":"bad host name"}` (empty or over 64 chars) | `{"error":"bad secret"}`. The connection stays open; authenticate on a new one.
 - After auth only:
-  - `{"cmd":"touch","events":[{"finger":1..10,"phase":"down|move|up","x":0..1,"y":0..1}]}` — **no reply** (latency).
+  - `{"cmd":"touch","events":[{"finger":1..10,"phase":"down|move|up","x":0..1,"y":0..1}]}` — **no reply** (latency). Events in one command are one multi-finger update. `down` on a finger already down = `move`; `move`/`up` on a finger not down are ignored; x/y are clamped to 0..1; invalid events are dropped. Fingers a connection still holds when it closes are lifted. Until the agent has seen one real touch since boot (`touch_ready: false`), touches are dropped.
   - `{"cmd":"key","usage":<HID usage>,"modifiers":<bits>}` — press+release, reply `{"ok":true}`.
   - `{"cmd":"text","text":"…"}` — pasteboard set + Cmd+V, previous pasteboard restored after 0.5 s → `{"ok":true}`.
   - `{"cmd":"clipboard_get"}` → `{"ok":true,"text":"…"}`; `{"cmd":"clipboard_set","text":"…"}` → `{"ok":true}`.
-  - `{"cmd":"screen"}` → `{"ok":true,"width":<points>,"height":<points>,"scale":<n>,"orientation":<UIInterfaceOrientation>}`.
+  - `{"cmd":"screen"}` → `{"ok":true,"width":<points>,"height":<points>,"scale":<n>,"orientation":<UIInterfaceOrientation>,"touch_ready":<bool>,"fingers_down":<n>}`.
   - `{"cmd":"screenshot"}` → `{"ok":true,"png":"<base64>"}`.
   - Unknown command → `{"error":"unknown command"}`.
   - Any command before auth → `{"error":"auth required"}` and connection closed.

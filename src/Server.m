@@ -1,6 +1,7 @@
 #import "Server.h"
 #import "Auth.h"
 #import "Pairing.h"
+#import "Touch.h"
 #import <arpa/inet.h>
 #import <errno.h>
 #import <os/log.h>
@@ -57,8 +58,14 @@ static void SetReadTimeout(int fd, int seconds) {
     setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv);
 }
 
-// Commands after auth; nil = no reply (touch). Filled in by the feature tasks.
-static NSDictionary *HandleCommand(NSString *cmd, NSDictionary *msg) {
+// Commands after auth; nil = no reply (touch). `held` = fingers this connection holds down.
+static NSDictionary *HandleCommand(NSString *cmd, NSDictionary *msg, NSMutableIndexSet *held) {
+    if ([cmd isEqual:@"touch"]) {
+        SATouch(msg[@"events"], held);
+        return nil;
+    }
+    if ([cmd isEqual:@"screen"]) // size and orientation: Task 7
+        return @{@"ok": @YES, @"touch_ready": @(SATouchReady()), @"fingers_down": @(SATouchFingersDown())};
     return @{@"error": @"unknown command"};
 }
 
@@ -100,11 +107,16 @@ static void ServeClient(int fd) {
     }
 
     SetReadTimeout(fd, 0);
-    for (NSDictionary *msg; (msg = ReadFrame(fd, MAX_FRAME));) {
-        NSString *cmd = msg[@"cmd"];
-        NSDictionary *reply = [cmd isKindOfClass:NSString.class] ? HandleCommand(cmd, msg)
-                                                                : @{@"error": @"missing cmd"};
-        if (reply && !WriteFrame(fd, reply)) return;
+    NSMutableIndexSet *held = [NSMutableIndexSet indexSet];
+    @try {
+        for (NSDictionary *msg; (msg = ReadFrame(fd, MAX_FRAME));) {
+            NSString *cmd = msg[@"cmd"];
+            NSDictionary *reply = [cmd isKindOfClass:NSString.class] ? HandleCommand(cmd, msg, held)
+                                                                    : @{@"error": @"missing cmd"};
+            if (reply && !WriteFrame(fd, reply)) return;
+        }
+    } @finally { // a finger left down would block the whole screen
+        SATouchRelease(held);
     }
 }
 

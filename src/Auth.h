@@ -4,6 +4,8 @@
 NSData *SARandomBytes(size_t n);
 NSString *SAHex(NSData *data);
 NSData *SAUnhex(NSString *hex); // nil unless an even-length string of hex digits
+// `file` in the agent's private state dir (created, mode 700, if missing).
+NSString *SAStatePath(NSString *file);
 
 typedef NS_ENUM(NSInteger, SAAuthResult) { SAAuthOK, SAAuthUnknownHost, SAAuthBadMac };
 

@@ -4,7 +4,7 @@ What is still to be built for jailbreak input, and what else is open across both
 status + acceptance-criteria document; the detailed design and step-by-step plan it builds on are:
 
 - Design: `docs/superpowers/specs/2026-10-19-scrcrappy-agent-design.md` (approved)
-- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–4 done)
+- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–5 done)
 - Wire protocol: `PROTOCOL.md`
 - Acceptance tests: `tests/test_conformance.py` (run with `.venv/bin/pytest -m phone -s`)
 
@@ -17,8 +17,8 @@ status + acceptance-criteria document; the detailed design and step-by-step plan
 | Dev install over USB | Done — `scripts/install.sh` (password typed by the user, never stored) |
 | Tweak loads into SpringBoard on the iPhone 8 | Confirmed (server answers on 7330) |
 | Reference client + pure tests | Done — `client/agent_client.py`, 6 tests pass |
-| Conformance suite | Task 3–4 tests pass on the phone; later ones wait for their tasks |
-| Agent features | Tasks 3–4 (server, auth gate, pairing) done; Tasks 5–8 **not started** |
+| Conformance suite | Task 3–5 tests pass on the phone; later ones wait for their tasks |
+| Agent features | Tasks 3–5 (server, auth gate, pairing, touch) done; Tasks 6–8 **not started** |
 | scrcrappy integration | **Not started** (building blocks `usbmux.py`, `geometry.to_device` are on scrcrappy `master`) |
 
 Test phone: iPhone 8, iOS 16.7.1, Dopamine (rootless) with ElleKit, Tweak Injection on, OpenSSH
@@ -47,7 +47,7 @@ any, has been seen working.
 - Tests (with taps): deny, busy, allow-then-auth.
 - Also refuses with `locked` while the phone is locked (no alert on the lock screen).
 
-### 1.3 Touch (plan Task 5)
+### 1.3 Touch (plan Task 5) — done (tap, swipe, pinch seen working; `screen` has only `touch_ready`/`fingers_down` until 1.5)
 - `touch` events with finger, phase and position as fractions of the portrait screen; no reply.
 - Learns what it needs from the first real touch after a reboot; until then `screen` reports
   `touch_ready: false` and touches are dropped without errors.
