@@ -9,7 +9,7 @@
   - `{"cmd":"touch","events":[{"finger":1..10,"phase":"down|move|up","x":0..1,"y":0..1}]}` — **no reply** (latency). Events in one command are one multi-finger update. `down` on a finger already down = `move`; `move`/`up` on a finger not down are ignored; x/y are clamped to 0..1; invalid events are dropped. Fingers a connection still holds when it closes are lifted. Until the agent has seen one real touch since boot (`touch_ready: false`), touches are dropped.
   - `{"cmd":"key","usage":<HID usage>,"modifiers":<bits>}` — press+release, reply `{"ok":true}` | `{"error":"bad key"}` (usage not 1..0xFFFF, modifiers not 0..255). `modifiers` is the HID modifier byte (bit 0 left Ctrl, 1 left Shift, 2 left Alt, 3 left Cmd, 4–7 right Ctrl/Shift/Alt/Cmd), held around the key; optional, default 0.
   - `{"cmd":"text","text":"…"}` — pasteboard set + Cmd+V → `{"ok":true}`. The text stays on the pasteboard (the previous one is not restored): iOS 16 shows "Allow Paste" for an injected paste, and changing the pasteboard would dismiss it. Settings › ‹app› › Paste from Other Apps › Allow stops the prompt for that app.
-  - `{"cmd":"clipboard_get"}` → `{"ok":true,"text":"…"}`; `{"cmd":"clipboard_set","text":"…"}` → `{"ok":true}`.
+  - `{"cmd":"clipboard_get"}` → `{"ok":true,"text":"…"}` | `{"error":"clipboard timeout"}` (not readable within 30 s, e.g. iOS is waiting on a paste permission); `{"cmd":"clipboard_set","text":"…"}` → `{"ok":true}`.
   - `{"cmd":"screen"}` → `{"ok":true,"width":<points>,"height":<points>,"scale":<n>,"orientation":<UIInterfaceOrientation>,"touch_ready":<bool>,"fingers_down":<n>}`.
   - `{"cmd":"screenshot"}` → `{"ok":true,"png":"<base64>"}`.
   - Unknown command → `{"error":"unknown command"}`.

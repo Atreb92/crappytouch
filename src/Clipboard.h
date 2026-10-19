@@ -1,7 +1,8 @@
 #import <Foundation/Foundation.h>
 
-// The general pasteboard's text ("" if none) / replace it with `text`. Any thread.
+// The general pasteboard's text ("" if none), or nil if it can't be read within 30 s. Not on the main thread.
 NSString *SAClipboardGet(void);
+// Replaces the general pasteboard with `text`. Any thread.
 void SAClipboardSet(NSString *text);
 
 // Types `text` into the focused field: pasteboard + Cmd+V. The text stays on the pasteboard: iOS asks

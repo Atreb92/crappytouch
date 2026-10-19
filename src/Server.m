@@ -79,8 +79,10 @@ static NSDictionary *HandleCommand(NSString *cmd, NSDictionary *msg, NSMutableIn
         else if (!SAText(text)) return @{@"error": @"can't type"};
         return @{@"ok": @YES};
     }
-    if ([cmd isEqual:@"clipboard_get"])
-        return @{@"ok": @YES, @"text": SAClipboardGet()};
+    if ([cmd isEqual:@"clipboard_get"]) {
+        NSString *text = SAClipboardGet();
+        return text ? @{@"ok": @YES, @"text": text} : @{@"error": @"clipboard timeout"};
+    }
     if ([cmd isEqual:@"screen"]) // size and orientation: Task 7
         return @{@"ok": @YES, @"touch_ready": @(SATouchReady()), @"fingers_down": @(SATouchFingersDown())};
     return @{@"error": @"unknown command"};
