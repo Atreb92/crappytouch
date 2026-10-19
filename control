@@ -1,0 +1,9 @@
+Package: dev.scrcrappy.agent
+Name: scrcrappy-agent
+Version: 0.1.0
+Architecture: iphoneos-arm64
+Description: Lets a paired computer running scrcrappy control this iPhone over USB (touch, keys, clipboard, screenshots). Localhost only, on-phone pairing prompt.
+Maintainer: scrcrappy
+Author: scrcrappy
+Section: Tweaks
+Depends: mobilesubstrate | ellekit
