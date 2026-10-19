@@ -27,5 +27,5 @@ void SAClipboardSet(NSString *text) {
 
 BOOL SAText(NSString *text) {
     SAClipboardSet(text);
-    return SAKey(USAGE_V, MOD_LEFT_CMD);
+    return SAKey(7, USAGE_V, MOD_LEFT_CMD);
 }

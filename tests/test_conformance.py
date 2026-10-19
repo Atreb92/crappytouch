@@ -172,6 +172,11 @@ def test_key_returns_ok(agent):  # Task 6
     assert agent.request({"cmd": "key", "usage": 0xE1, "modifiers": 0})["ok"] is True  # left shift: no effect
 
 
+def test_key_bad_page_refused(agent):  # buttons use page 0x0C; out-of-range pages are refused
+    with pytest.raises(ac.AgentError, match="bad key"):
+        agent.request({"cmd": "key", "page": 0x10000, "usage": 0x40})
+
+
 def test_screenshot_is_png_of_screen_size(agent):  # Task 7
     info = agent.request({"cmd": "screen"})
     png = base64.b64decode(agent.request({"cmd": "screenshot"})["png"])

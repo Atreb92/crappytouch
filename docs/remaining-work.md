@@ -64,6 +64,11 @@ any, has been seen working.
 - Tests: clipboard round trip with emoji, text leaves its text on the clipboard, key ok. Manual: accented
   text and emoji appear in Notes; Backspace deletes.
 
+### 1.4b Buttons (added 2026-10-19, was "later") — done
+- `key` with `page: 0x0C`: Home, double Home = app switcher, lock, volume — all seen working on the
+  iPhone 8. **Not yet checked on a Face ID iPhone** (the iPhone X): Home / switcher should behave like a
+  keyboard's Home key there, but confirm.
+
 ### 1.5 Screen info and screenshot (plan Task 7) — done
 - `screen`: size in points, scale, interface orientation, plus `touch_ready` and `fingers_down`.
 - `screenshot`: lossless PNG of the real screen (real status bar), base64 in the reply.
@@ -89,6 +94,7 @@ any, has been seen working.
   Home on the left → 4. Screenshots stay 750×1334 (panel portrait) in every orientation; the app's
   top edge is on the image's right for 3 (rotate 90° counter-clockwise to show upright) and on its
   left for 4 (rotate 90° clockwise).
+- **Buttons in agent mode**: Home, app switcher, lock, volume via `key` page 0x0C (agent side done).
 - **Toolbar in agent mode**: Paste via `text`; **Copy** enabled (phone clipboard → computer);
   new **Screenshot** button saving a PNG; the custom AssistiveTouch buttons stay BLE/ESP32-only
   (what the agent shows instead is still to be decided by the user).
@@ -98,8 +104,7 @@ any, has been seen working.
 
 Tracked in scrcrappy's `TODO.md`; summary:
 
-- Later: full terminal over SSH through the USB tunnel; hardware buttons (Home, lock, volume) and
-  opening apps through the agent.
+- Later: full terminal over SSH through the USB tunnel; opening apps through the agent.
 - BLE: link-speed experiment (advertise as a mouse again to get back to 8 ms reports); mouse wheel
   doesn't scroll iOS Settings lists; long vertical moves land 5–10 % short; paste limited to US
   ASCII; optional `--ctrl-as-cmd`.

@@ -68,9 +68,9 @@ static NSDictionary *HandleCommand(NSString *cmd, NSDictionary *msg, NSMutableIn
         return nil;
     }
     if ([cmd isEqual:@"key"]) {
-        id usage = msg[@"usage"], mods = msg[@"modifiers"] ?: @0;
-        BOOL ok = [usage isKindOfClass:NSNumber.class] && [mods isKindOfClass:NSNumber.class] &&
-                  SAKey([usage integerValue], [mods integerValue]);
+        id page = msg[@"page"] ?: @7, usage = msg[@"usage"], mods = msg[@"modifiers"] ?: @0;
+        BOOL ok = [page isKindOfClass:NSNumber.class] && [usage isKindOfClass:NSNumber.class] &&
+                  [mods isKindOfClass:NSNumber.class] && SAKey([page integerValue], [usage integerValue], [mods integerValue]);
         return ok ? @{@"ok": @YES} : @{@"error": @"bad key"};
     }
     if ([cmd isEqual:@"text"] || [cmd isEqual:@"clipboard_set"]) {
