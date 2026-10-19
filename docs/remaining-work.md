@@ -106,9 +106,11 @@ any, has been seen working.
   `dpkg-scanpackages` + `Release` from `apt-ftparchive`), e.g. on GitHub Pages; a
   `scripts/make-repo.sh` to regenerate it from the `FINALPACKAGE=1` build. Open decisions: public or
   not, the `Maintainer` field (now just `scrcrappy`), where to host.
-- **Before calling the agent done**: install the release build (`FINALPACKAGE=1`, never run on the
-  phone yet) and run the whole conformance suite in one go; Home / app switcher on the iPhone X
-  (Face ID); arm64e is untested (no arm64e phone; the Linux toolchain builds it with the old ABI).
+- **Release build verified (2026-10-19, iPhone 8)**: v0.2.0 `FINALPACKAGE=1` — full conformance suite
+  (17 phone tests) in one go, plus swipe, tap, Home, typing by keys, paste with accents/emoji (Allow
+  Paste), Backspace.
+- **Still to check**: Home / app switcher on the iPhone X (Face ID); arm64e is untested (no arm64e
+  phone; the Linux toolchain builds it with the old ABI).
 
 Tracked in scrcrappy's `TODO.md`; summary:
 
