@@ -2,6 +2,8 @@
 #import "Auth.h"
 #import "Pairing.h"
 #import "Touch.h"
+#import "Keyboard.h"
+#import "Clipboard.h"
 #import <arpa/inet.h>
 #import <errno.h>
 #import <os/log.h>
@@ -64,6 +66,21 @@ static NSDictionary *HandleCommand(NSString *cmd, NSDictionary *msg, NSMutableIn
         SATouch(msg[@"events"], held);
         return nil;
     }
+    if ([cmd isEqual:@"key"]) {
+        id usage = msg[@"usage"], mods = msg[@"modifiers"] ?: @0;
+        BOOL ok = [usage isKindOfClass:NSNumber.class] && [mods isKindOfClass:NSNumber.class] &&
+                  SAKey([usage integerValue], [mods integerValue]);
+        return ok ? @{@"ok": @YES} : @{@"error": @"bad key"};
+    }
+    if ([cmd isEqual:@"text"] || [cmd isEqual:@"clipboard_set"]) {
+        NSString *text = msg[@"text"];
+        if (![text isKindOfClass:NSString.class]) return @{@"error": @"bad text"};
+        if ([cmd isEqual:@"clipboard_set"]) SAClipboardSet(text);
+        else if (!SAText(text)) return @{@"error": @"can't type"};
+        return @{@"ok": @YES};
+    }
+    if ([cmd isEqual:@"clipboard_get"])
+        return @{@"ok": @YES, @"text": SAClipboardGet()};
     if ([cmd isEqual:@"screen"]) // size and orientation: Task 7
         return @{@"ok": @YES, @"touch_ready": @(SATouchReady()), @"fingers_down": @(SATouchFingersDown())};
     return @{@"error": @"unknown command"};

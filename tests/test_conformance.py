@@ -163,11 +163,9 @@ def test_clipboard_roundtrip(agent):  # Task 6
     assert agent.request({"cmd": "clipboard_get"})["text"] == "scrcrappy è😀"
 
 
-def test_text_restores_clipboard(agent):  # Task 6
-    agent.request({"cmd": "clipboard_set", "text": "keep me"})
+def test_text_leaves_text_on_clipboard(agent):  # Task 6: restoring would dismiss iOS's "Allow Paste" prompt
     agent.request({"cmd": "text", "text": "x"})
-    time.sleep(1)
-    assert agent.request({"cmd": "clipboard_get"})["text"] == "keep me"
+    assert agent.request({"cmd": "clipboard_get"})["text"] == "x"
 
 
 def test_key_returns_ok(agent):  # Task 6

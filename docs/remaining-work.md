@@ -4,7 +4,7 @@ What is still to be built for jailbreak input, and what else is open across both
 status + acceptance-criteria document; the detailed design and step-by-step plan it builds on are:
 
 - Design: `docs/superpowers/specs/2026-10-19-scrcrappy-agent-design.md` (approved)
-- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–5 done)
+- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–6 done)
 - Wire protocol: `PROTOCOL.md`
 - Acceptance tests: `tests/test_conformance.py` (run with `.venv/bin/pytest -m phone -s`)
 
@@ -17,8 +17,8 @@ status + acceptance-criteria document; the detailed design and step-by-step plan
 | Dev install over USB | Done — `scripts/install.sh` (password typed by the user, never stored) |
 | Tweak loads into SpringBoard on the iPhone 8 | Confirmed (server answers on 7330) |
 | Reference client + pure tests | Done — `client/agent_client.py`, 6 tests pass |
-| Conformance suite | Task 3–5 tests pass on the phone; later ones wait for their tasks |
-| Agent features | Tasks 3–5 (server, auth gate, pairing, touch) done; Tasks 6–8 **not started** |
+| Conformance suite | Task 3–6 tests pass on the phone; later ones wait for their tasks |
+| Agent features | Tasks 3–6 (server, auth gate, pairing, touch, keys/text/clipboard) done; Tasks 7–8 **not started** |
 | scrcrappy integration | **Not started** (building blocks `usbmux.py`, `geometry.to_device` are on scrcrappy `master`) |
 
 Test phone: iPhone 8, iOS 16.7.1, Dopamine (rootless) with ElleKit, Tweak Injection on, OpenSSH
@@ -55,10 +55,13 @@ any, has been seen working.
 - Tests: touch keeps the connection usable, fingers released on disconnect. Manual: tap opens an
   app, drag scrolls, two-finger pinch zooms.
 
-### 1.4 Keys, text, clipboard (plan Task 6)
+### 1.4 Keys, text, clipboard (plan Task 6) — done (accents/emoji pasted into Notes, Backspace deleted)
 - `key` (HID usage + modifiers), `text` (any Unicode, typed via the pasteboard and a paste
-  shortcut, the user's previous clipboard restored afterwards), `clipboard_get` / `clipboard_set`.
-- Tests: clipboard round trip with emoji, text restores the clipboard, key ok. Manual: accented
+  shortcut; the text stays on the clipboard, see below), `clipboard_get` / `clipboard_set`.
+- iOS 16 shows "Allow Paste" for the injected paste (it can tell the Cmd+V isn't a real keyboard's).
+  Decided 2026-10-19: no clipboard restore (it dismissed the prompt); per app, Settings › Paste from
+  Other Apps › Allow stops the prompt.
+- Tests: clipboard round trip with emoji, text leaves its text on the clipboard, key ok. Manual: accented
   text and emoji appear in Notes; Backspace deletes.
 
 ### 1.5 Screen info and screenshot (plan Task 7)
