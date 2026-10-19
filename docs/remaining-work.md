@@ -4,7 +4,7 @@ What is still to be built for jailbreak input, and what else is open across both
 status + acceptance-criteria document; the detailed design and step-by-step plan it builds on are:
 
 - Design: `docs/superpowers/specs/2026-10-19-scrcrappy-agent-design.md` (approved)
-- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–3 done)
+- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–4 done)
 - Wire protocol: `PROTOCOL.md`
 - Acceptance tests: `tests/test_conformance.py` (run with `.venv/bin/pytest -m phone -s`)
 
@@ -17,8 +17,8 @@ status + acceptance-criteria document; the detailed design and step-by-step plan
 | Dev install over USB | Done — `scripts/install.sh` (password typed by the user, never stored) |
 | Tweak loads into SpringBoard on the iPhone 8 | Confirmed (server answers on 7330) |
 | Reference client + pure tests | Done — `client/agent_client.py`, 6 tests pass |
-| Conformance suite | Task 3 tests pass on the phone; later ones wait for their tasks |
-| Agent features | Task 3 (server + auth gate) done; Tasks 4–8 **not started** |
+| Conformance suite | Task 3–4 tests pass on the phone; later ones wait for their tasks |
+| Agent features | Tasks 3–4 (server, auth gate, pairing) done; Tasks 5–8 **not started** |
 | scrcrappy integration | **Not started** (building blocks `usbmux.py`, `geometry.to_device` are on scrcrappy `master`) |
 
 Test phone: iPhone 8, iOS 16.7.1, Dopamine (rootless) with ElleKit, Tweak Injection on, OpenSSH
@@ -39,12 +39,13 @@ any, has been seen working.
 - `auth` checks the host id against the stored hosts and the HMAC of the nonce in constant time.
 - Tests: hello, command-before-auth, garbage, huge length, unknown host, bad mac.
 
-### 1.2 Pairing prompt (plan Task 4)
+### 1.2 Pairing prompt (plan Task 4) — done
 - `pair` shows an alert in SpringBoard naming the computer and the 6-digit code; Allow stores the
   host, Deny or 30 s without an answer refuses.
 - Only one pending alert; a second `pair` while one is open gets `busy` (no alert spam).
 - Hosts file in the agent's own state dir, private to the `mobile` user; revocation = delete it.
 - Tests (with taps): deny, busy, allow-then-auth.
+- Also refuses with `locked` while the phone is locked (no alert on the lock screen).
 
 ### 1.3 Touch (plan Task 5)
 - `touch` events with finger, phase and position as fractions of the portrait screen; no reply.

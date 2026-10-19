@@ -1,5 +1,6 @@
 #import "Server.h"
 #import "Auth.h"
+#import "Pairing.h"
 #import <arpa/inet.h>
 #import <errno.h>
 #import <os/log.h>
@@ -86,7 +87,12 @@ static void ServeClient(int fd) {
                    [msg[@"host"] isKindOfClass:NSString.class] ? msg[@"host"] : @"?");
             break;
         } else if ([cmd isEqual:@"pair"]) {
-            if (!WriteFrame(fd, @{@"error": @"pairing not available yet"})) return; // Task 4
+            NSString *name = msg[@"host"];
+            NSData *secret = SAUnhex(msg[@"secret"]);
+            NSString *error = ![name isKindOfClass:NSString.class] || !name.length || name.length > 64 ? @"bad host name"
+                            : secret.length != 32 ? @"bad secret"
+                            : SAPair(name, secret);
+            if (!WriteFrame(fd, error ? @{@"error": error} : @{@"ok": @YES})) return;
         } else {
             WriteFrame(fd, @{@"error": @"auth required"});
             return;

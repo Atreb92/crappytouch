@@ -4,7 +4,7 @@
 - Agent → on connect: `{"hello": 1, "nonce": "<32 hex>", "addr": "127.0.0.1"}` (`addr` = the address the agent is bound to).
 - Before auth: frames over 64 KiB, or 10 s without data, close the connection. At most 8 connections at once; more are closed on accept.
 - `{"cmd":"auth","host":"<name>","id":"<hex id>","mac":"<hex HMAC-SHA256(key, nonce bytes)>"}` (id / key derived as in Global Constraints) → `{"ok":true}` | `{"error":"unknown host"}` | `{"error":"bad mac"}`; a failed auth closes the connection (one try per nonce).
-- `{"cmd":"pair","host":"<name>","secret":"<64 hex>"}` → alert "Allow ‹name› to control this iPhone? Code ‹code›"; `code` = first 3 bytes of sha256(secret) as int % 1 000 000, zero-padded 6 digits → `{"ok":true}` | `{"error":"denied"}` (Deny or 30 s) | `{"error":"busy"}` (another pairing pending).
+- `{"cmd":"pair","host":"<name>","secret":"<64 hex>"}` → alert "Allow ‹name› to control this iPhone? Code ‹code›"; `code` = first 3 bytes of sha256(secret) as int % 1 000 000, zero-padded 6 digits → `{"ok":true}` | `{"error":"denied"}` (Deny or 30 s) | `{"error":"busy"}` (another pairing pending) | `{"error":"locked"}` (phone locked: unlock it first, no alert is shown) | `{"error":"bad host name"}` (empty or over 64 chars) | `{"error":"bad secret"}`. The connection stays open; authenticate on a new one.
 - After auth only:
   - `{"cmd":"touch","events":[{"finger":1..10,"phase":"down|move|up","x":0..1,"y":0..1}]}` — **no reply** (latency).
   - `{"cmd":"key","usage":<HID usage>,"modifiers":<bits>}` — press+release, reply `{"ok":true}`.

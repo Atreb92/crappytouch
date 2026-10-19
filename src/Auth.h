@@ -9,3 +9,6 @@ typedef NS_ENUM(NSInteger, SAAuthResult) { SAAuthOK, SAAuthUnknownHost, SAAuthBa
 
 // Checks `mac` = hex HMAC-SHA256(key, nonce) for the host `hostID` in hosts.plist (PROTOCOL.md).
 SAAuthResult SAAuthCheck(NSString *hostID, NSString *mac, NSData *nonce);
+
+// Remembers the computer that owns `secret` (32 bytes) under its derived id; NO if hosts.plist can't be written.
+BOOL SAAuthAddHost(NSString *name, NSData *secret);
