@@ -102,6 +102,14 @@ any, has been seen working.
 
 ## 3. Other open items
 
+- **Sileo repo (later, after the agent is verified)**: static repo (`.deb` + `Packages*` from
+  `dpkg-scanpackages` + `Release` from `apt-ftparchive`), e.g. on GitHub Pages; a
+  `scripts/make-repo.sh` to regenerate it from the `FINALPACKAGE=1` build. Open decisions: public or
+  not, the `Maintainer` field (now just `scrcrappy`), where to host.
+- **Before calling the agent done**: install the release build (`FINALPACKAGE=1`, never run on the
+  phone yet) and run the whole conformance suite in one go; Home / app switcher on the iPhone X
+  (Face ID); arm64e is untested (no arm64e phone; the Linux toolchain builds it with the old ABI).
+
 Tracked in scrcrappy's `TODO.md`; summary:
 
 - Later: full terminal over SSH through the USB tunnel; opening apps through the agent.
