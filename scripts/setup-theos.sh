@@ -1,6 +1,6 @@
 #!/bin/sh
 # Installs Theos, the Linux iOS toolchain and an iOS SDK into $THEOS (default ~/theos), user-level
-# only: no sudo, no shell profile edits. Idempotent. System packages first (Fedora):
+# only: no sudo. Idempotent. System packages first (Fedora):
 #   sudo dnf install -y fakeroot perl rsync zip git xz
 set -eu
 export THEOS=${THEOS:-$HOME/theos}

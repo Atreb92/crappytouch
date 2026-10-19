@@ -2,7 +2,7 @@
 
 SpringBoard tweak (rootless jailbreaks) that lets a computer running
 [scrcrappy](../scrcrappy) control the iPhone over USB: touches, keys, clipboard, screen info,
-screenshots. Nothing else: no shell, no network access, no injection into apps.
+screenshots. 
 
 Security model: listens on 127.0.0.1 only (reached over USB through usbmuxd); every connection
 must authenticate; a new computer must be approved with an on-phone *Allow* prompt. See

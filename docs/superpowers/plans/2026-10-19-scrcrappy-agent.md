@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Inject into **SpringBoard only** (`Filter = { Bundles = ("com.apple.springboard"); }`).
-- Listen on **127.0.0.1:7330** only. No shell, no files outside the agent's own state dir, no sudo/setuid, no postinst that touches other packages.
+- Listen on **127.0.0.1:7330** only. No files outside the agent's own state dir, no sudo/setuid, no postinst that touches other packages.
 - State dir `/var/jb/var/mobile/Library/scrcrappy-agent/` (mode 700, owner mobile): `hosts.plist` = { id: {name, key} } with id = hex SHA-256("scrcrappy-id" + secret) and key = SHA-256("scrcrappy-key" + secret) — distinct, so the id sent in `auth` never reveals the HMAC key.
 - Package: rootless (`THEOS_PACKAGE_SCHEME=rootless`), archs `arm64 arm64e`, id `dev.scrcrappy.agent`, MIT.
 

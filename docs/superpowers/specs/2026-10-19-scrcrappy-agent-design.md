@@ -30,8 +30,6 @@ user approved on the phone.
 
 ## Non-goals
 
-- Shell commands (user decision: a full terminal will come via OpenSSH over the USB tunnel, later,
-  in scrcrappy — not in the agent).
 - Scripts, OCR, image matching, touch recording, web dashboard, Shortcuts integration.
 - Hardware buttons (Home, lock, volume) and opening apps: later (SpringBoard can do them).
 - Wi-Fi access: USB only.

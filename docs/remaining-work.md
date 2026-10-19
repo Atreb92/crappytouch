@@ -71,8 +71,6 @@ any, has been seen working.
 
 ### Must hold throughout (from the design's anti-goals)
 - Not reachable from the network; nothing usable by an app on the phone without the user's Allow.
-- No shell commands, no root path (no sudoers, setuid, re-signed apps), no injection outside
-  SpringBoard, no install scripts touching other packages.
 
 ## 2. scrcrappy integration (scrcrappy repo)
 
