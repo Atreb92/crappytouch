@@ -4,7 +4,7 @@ What is still to be built for jailbreak input, and what else is open across both
 status + acceptance-criteria document; the detailed design and step-by-step plan it builds on are:
 
 - Design: `docs/superpowers/specs/2026-10-19-scrcrappy-agent-design.md` (approved)
-- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–2 done)
+- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–3 done)
 - Wire protocol: `PROTOCOL.md`
 - Acceptance tests: `tests/test_conformance.py` (run with `.venv/bin/pytest -m phone -s`)
 
@@ -15,10 +15,10 @@ status + acceptance-criteria document; the detailed design and step-by-step plan
 | Toolchain (Theos + iOS 16.5 SDK on Fedora, no sudo) | Done — `scripts/setup-theos.sh` |
 | Rootless package build | Done — `make package` → `packages/*.deb` (2 files under `/var/jb`) |
 | Dev install over USB | Done — `scripts/install.sh` (password typed by the user, never stored) |
-| Skeleton tweak installed on the iPhone 8 | Installed (`install ok installed`); **loading into SpringBoard not yet confirmed** (its log line never reached `idevicesyslog`) |
+| Tweak loads into SpringBoard on the iPhone 8 | Confirmed (server answers on 7330) |
 | Reference client + pure tests | Done — `client/agent_client.py`, 6 tests pass |
-| Conformance suite | Written; fails at the first test (nothing listens on port 7330 yet) |
-| Agent features (Tasks 3–8) | **Not started** |
+| Conformance suite | Task 3 tests pass on the phone; later ones wait for their tasks |
+| Agent features | Task 3 (server + auth gate) done; Tasks 4–8 **not started** |
 | scrcrappy integration | **Not started** (building blocks `usbmux.py`, `geometry.to_device` are on scrcrappy `master`) |
 
 Test phone: iPhone 8, iOS 16.7.1, Dopamine (rootless) with ElleKit, Tweak Injection on, OpenSSH
@@ -29,7 +29,7 @@ installed.
 Each item is done when its conformance tests pass against the real phone and the manual check, if
 any, has been seen working.
 
-### 1.1 Server and auth gate (plan Task 3)
+### 1.1 Server and auth gate (plan Task 3) — done
 - Listens on 127.0.0.1:7330 only, started from SpringBoard; also serves as the "tweak is loaded"
   signal that the log line failed to give.
 - On connect sends `hello` with protocol version, a fresh random nonce and the bound address.

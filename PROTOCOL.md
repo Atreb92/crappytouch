@@ -1,8 +1,9 @@
 # scrcrappy-agent protocol v1
 
 - Frame: 4-byte big-endian length + UTF-8 JSON object. Max 16 MiB.
-- Agent → on connect: `{"hello": 1, "nonce": "<32 hex>"}`.
-- `{"cmd":"auth","host":"<name>","id":"<hex id>","mac":"<hex HMAC-SHA256(key, nonce bytes)>"}` (id / key derived as in Global Constraints) → `{"ok":true}` | `{"error":"unknown host"}` | `{"error":"bad mac"}`.
+- Agent → on connect: `{"hello": 1, "nonce": "<32 hex>", "addr": "127.0.0.1"}` (`addr` = the address the agent is bound to).
+- Before auth: frames over 64 KiB, or 10 s without data, close the connection. At most 8 connections at once; more are closed on accept.
+- `{"cmd":"auth","host":"<name>","id":"<hex id>","mac":"<hex HMAC-SHA256(key, nonce bytes)>"}` (id / key derived as in Global Constraints) → `{"ok":true}` | `{"error":"unknown host"}` | `{"error":"bad mac"}`; a failed auth closes the connection (one try per nonce).
 - `{"cmd":"pair","host":"<name>","secret":"<64 hex>"}` → alert "Allow ‹name› to control this iPhone? Code ‹code›"; `code` = first 3 bytes of sha256(secret) as int % 1 000 000, zero-padded 6 digits → `{"ok":true}` | `{"error":"denied"}` (Deny or 30 s) | `{"error":"busy"}` (another pairing pending).
 - After auth only:
   - `{"cmd":"touch","events":[{"finger":1..10,"phase":"down|move|up","x":0..1,"y":0..1}]}` — **no reply** (latency).
@@ -11,6 +12,7 @@
   - `{"cmd":"clipboard_get"}` → `{"ok":true,"text":"…"}`; `{"cmd":"clipboard_set","text":"…"}` → `{"ok":true}`.
   - `{"cmd":"screen"}` → `{"ok":true,"width":<points>,"height":<points>,"scale":<n>,"orientation":<UIInterfaceOrientation>}`.
   - `{"cmd":"screenshot"}` → `{"ok":true,"png":"<base64>"}`.
+  - Unknown command → `{"error":"unknown command"}`.
   - Any command before auth → `{"error":"auth required"}` and connection closed.
 - Coordinates are fractions of the portrait screen (0..1), so the host never needs device units.
 
