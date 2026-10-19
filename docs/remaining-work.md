@@ -4,7 +4,7 @@ What is still to be built for jailbreak input, and what else is open across both
 status + acceptance-criteria document; the detailed design and step-by-step plan it builds on are:
 
 - Design: `docs/superpowers/specs/2026-10-19-scrcrappy-agent-design.md` (approved)
-- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–6 done)
+- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–7 done)
 - Wire protocol: `PROTOCOL.md`
 - Acceptance tests: `tests/test_conformance.py` (run with `.venv/bin/pytest -m phone -s`)
 
@@ -17,8 +17,8 @@ status + acceptance-criteria document; the detailed design and step-by-step plan
 | Dev install over USB | Done — `scripts/install.sh` (password typed by the user, never stored) |
 | Tweak loads into SpringBoard on the iPhone 8 | Confirmed (server answers on 7330) |
 | Reference client + pure tests | Done — `client/agent_client.py`, 6 tests pass |
-| Conformance suite | Task 3–6 tests pass on the phone; later ones wait for their tasks |
-| Agent features | Tasks 3–6 (server, auth gate, pairing, touch, keys/text/clipboard) done; Tasks 7–8 **not started** |
+| Conformance suite | all pass on the phone (Tasks 3–7) |
+| Agent features | Tasks 3–7 done; Task 8 (packaging, docs) **not started** |
 | scrcrappy integration | **Not started** (building blocks `usbmux.py`, `geometry.to_device` are on scrcrappy `master`) |
 
 Test phone: iPhone 8, iOS 16.7.1, Dopamine (rootless) with ElleKit, Tweak Injection on, OpenSSH
@@ -47,7 +47,7 @@ any, has been seen working.
 - Tests (with taps): deny, busy, allow-then-auth.
 - Also refuses with `locked` while the phone is locked (no alert on the lock screen).
 
-### 1.3 Touch (plan Task 5) — done (tap, swipe, pinch seen working; `screen` has only `touch_ready`/`fingers_down` until 1.5)
+### 1.3 Touch (plan Task 5) — done (tap, swipe, pinch seen working)
 - `touch` events with finger, phase and position as fractions of the portrait screen; no reply.
 - Learns what it needs from the first real touch after a reboot; until then `screen` reports
   `touch_ready: false` and touches are dropped without errors.
@@ -64,7 +64,7 @@ any, has been seen working.
 - Tests: clipboard round trip with emoji, text leaves its text on the clipboard, key ok. Manual: accented
   text and emoji appear in Notes; Backspace deletes.
 
-### 1.5 Screen info and screenshot (plan Task 7)
+### 1.5 Screen info and screenshot (plan Task 7) — done
 - `screen`: size in points, scale, interface orientation, plus `touch_ready` and `fingers_down`.
 - `screenshot`: lossless PNG of the real screen (real status bar), base64 in the reply.
 - Tests: screen info shape, screenshot is a PNG of the screen's pixel size.
@@ -84,8 +84,11 @@ any, has been seen working.
 - **Input**: window clicks/drags → `touch` via `geometry.to_device` (absolute, no cursor
   following); Ctrl+drag → two-finger pinch; wheel → short swipe; keys → `key`; release held
   fingers and keys on focus loss.
-- **Rotation**: read orientation from `screen`; confirm `ROTATION_BY_ORIENTATION` for the two
-  landscape directions on the phone (marked `ponytail:` in `geometry.py`).
+- **Rotation**: read orientation from `screen`; check `ROTATION_BY_ORIENTATION` in `geometry.py`
+  against what the phone showed (2026-10-19, iPhone 8, Notes): Home button on the right → `orientation` 3,
+  Home on the left → 4. Screenshots stay 750×1334 (panel portrait) in every orientation; the app's
+  top edge is on the image's right for 3 (rotate 90° counter-clockwise to show upright) and on its
+  left for 4 (rotate 90° clockwise).
 - **Toolbar in agent mode**: Paste via `text`; **Copy** enabled (phone clipboard → computer);
   new **Screenshot** button saving a PNG; the custom AssistiveTouch buttons stay BLE/ESP32-only
   (what the agent shows instead is still to be decided by the user).
