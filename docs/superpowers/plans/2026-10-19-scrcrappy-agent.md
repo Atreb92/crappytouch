@@ -14,14 +14,14 @@
 
 - Inject into **SpringBoard only** (`Filter = { Bundles = ("com.apple.springboard"); }`).
 - Listen on **127.0.0.1:7330** only. No shell, no files outside the agent's own state dir, no sudo/setuid, no postinst that touches other packages.
-- State dir `/var/jb/var/mobile/Library/scrcrappy-agent/` (mode 700, owner mobile): `hosts.plist` = { host_id(hex SHA-256(secret)): {name, key(hex SHA-256(secret))} }.
+- State dir `/var/jb/var/mobile/Library/scrcrappy-agent/` (mode 700, owner mobile): `hosts.plist` = { id: {name, key} } with id = hex SHA-256("scrcrappy-id" + secret) and key = SHA-256("scrcrappy-key" + secret) — distinct, so the id sent in `auth` never reveals the HMAC key.
 - Package: rootless (`THEOS_PACKAGE_SCHEME=rootless`), archs `arm64 arm64e`, id `dev.scrcrappy.agent`, MIT.
 
 ## Protocol v1 (decided here; documented in `PROTOCOL.md` by Task 1)
 
 - Frame: 4-byte big-endian length + UTF-8 JSON object. Max 16 MiB.
 - Agent → on connect: `{"hello": 1, "nonce": "<32 hex>"}`.
-- `{"cmd":"auth","host":"<name>","id":"<hex sha256(secret)>","mac":"<hex HMAC-SHA256(key=sha256(secret), msg=nonce bytes)>"}` → `{"ok":true}` | `{"error":"unknown host"}` | `{"error":"bad mac"}`.
+- `{"cmd":"auth","host":"<name>","id":"<hex id>","mac":"<hex HMAC-SHA256(key, nonce bytes)>"}` (id / key derived as in Global Constraints) → `{"ok":true}` | `{"error":"unknown host"}` | `{"error":"bad mac"}`.
 - `{"cmd":"pair","host":"<name>","secret":"<64 hex>"}` → alert "Allow ‹name› to control this iPhone? Code ‹code›"; `code` = first 3 bytes of sha256(secret) as int % 1 000 000, zero-padded 6 digits → `{"ok":true}` | `{"error":"denied"}` (Deny or 30 s) | `{"error":"busy"}` (another pairing pending).
 - After auth only:
   - `{"cmd":"touch","events":[{"finger":1..10,"phase":"down|move|up","x":0..1,"y":0..1}]}` — **no reply** (latency).
@@ -57,7 +57,7 @@
 
 **Files:** `client/agent_client.py` (stdlib: usbmux connect, frames, auth, pair, commands; key file `~/.config/scrcrappy/agent-<udid>.key`), `tests/conformance.py` (pytest, marks `phone` for tests needing the phone + manual taps), `tests/test_client.py` (pure: frame encode/decode, code derivation, HMAC vector).
 
-- [ ] Pure tests first (RED → GREEN): `test_frame_roundtrip`, `test_rejects_oversized_frame`, `test_pairing_code_vector` (secret `00…01` → fixed code, value computed once and pinned), `test_mac_vector`.
+- [ ] Pure tests first (RED → GREEN): `test_frame_roundtrip`, `test_rejects_oversized_frame`, `test_pairing_code_vector` (secret `00…01` → fixed code, value computed once and pinned), `test_mac_vector`, `test_id_and_key_differ`.
 - [ ] Conformance tests written now, all failing until later tasks: hello, auth-required, garbage, pair-busy, auth after pair, touch, key, text, clipboard, screen, screenshot.
 - [ ] Commit `test: protocol client and conformance suite`.
 
