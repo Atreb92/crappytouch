@@ -19,7 +19,7 @@ status + acceptance-criteria document; the detailed design and step-by-step plan
 | Reference client + pure tests | Done — `client/agent_client.py`, 6 tests pass |
 | Conformance suite | all pass on the phone (Tasks 3–7) |
 | Agent features | Tasks 3–8 done (v0.2.0) |
-| scrcrappy integration | **Not started** (building blocks `usbmux.py`, `geometry.to_device` are on scrcrappy `master`) |
+| scrcrappy integration | Done (2026-10-19/20) — `--mouse agent`, plus AI control (`scrcrappy agent …` CLI and MCP); see §2 |
 
 Test phone: iPhone 8, iOS 16.7.1, Dopamine (rootless) with ElleKit, Tweak Injection on, OpenSSH
 installed.
@@ -81,24 +81,29 @@ any, has been seen working.
 ### Must hold throughout (from the design's anti-goals)
 - Not reachable from the network; nothing usable by an app on the phone without the user's Allow.
 
-## 2. scrcrappy integration (scrcrappy repo)
+## 2. scrcrappy integration (scrcrappy repo) — done
 
-- **Backend `--mouse agent`**: connect with `usbmux.connect(7330)`, vendor
-  `client/agent_client.py`, pair on first use (show the code in the terminal and the window),
-  authenticate afterwards. Clear errors when the agent isn't installed / not paired / denied.
-- **Input**: window clicks/drags → `touch` via `geometry.to_device` (absolute, no cursor
-  following); Ctrl+drag → two-finger pinch; wheel → short swipe; keys → `key`; release held
-  fingers and keys on focus loss.
-- **Rotation**: read orientation from `screen`; check `ROTATION_BY_ORIENTATION` in `geometry.py`
-  against what the phone showed (2026-10-19, iPhone 8, Notes): Home button on the right → `orientation` 3,
-  Home on the left → 4. Screenshots stay 750×1334 (panel portrait) in every orientation; the app's
-  top edge is on the image's right for 3 (rotate 90° counter-clockwise to show upright) and on its
-  left for 4 (rotate 90° clockwise).
-- **Buttons in agent mode**: Home, app switcher, lock, volume via `key` page 0x0C (agent side done).
-- **Toolbar in agent mode**: Paste via `text`; **Copy** enabled (phone clipboard → computer);
-  new **Screenshot** button saving a PNG; the custom AssistiveTouch buttons stay BLE/ESP32-only
-  (what the agent shows instead is still to be decided by the user).
-- Tests: backend unit tests against a fake agent speaking the protocol; manual run on the phone.
+Built and merged on scrcrappy `master` (2026-10-19/20), verified on the iPhone 8:
+
+- **Backend `--mouse agent`** (or Input › Agent in scrcrappy's Settings): the client is vendored as
+  `scrcrappy/agent_client.py`; pairs on first use (code in the terminal), authenticates afterwards,
+  clear errors when the agent isn't installed, the pairing is denied, or usbmuxd doesn't answer. The
+  connection is reopened when qvh switches the phone's USB configuration or SpringBoard resprings.
+- **Input**: clicks/drags → `touch` at the exact spot; Ctrl+drag → pinch; wheel → short swipe; keys →
+  `key` (held keys repeat); fingers and modifiers released on focus loss.
+- **Rotation**: `ROTATION_BY_ORIENTATION` now matches the phone (3 → 270, 4 → 90, as the screenshot
+  notes above say). Landscape taps still to be checked by hand (scrcrappy `TODO.md`).
+- **Toolbar in agent mode**: Paste (via `text`), Copy (phone clipboard → computer), Screenshot (PNG,
+  upright), Home, App switcher, Lock. Volume buttons left out by the user's choice.
+- **AI control** (added on top): `scrcrappy agent --screenshot | --tap | --long-press | --swipe |
+  --type | --clipboard` (one action per call, JSON out, percent coordinates), and an MCP server inside
+  the scrcrappy window for both agent and Bluetooth/ESP32 modes. Typing uses `key` when a US layout can
+  type the text, `text` (paste) otherwise.
+- Tests: unit tests against a fake agent in scrcrappy's suite; manual runs on the phone.
+
+Known limits seen from scrcrappy: `clipboard_get` and the paste behind `text` can trigger *Allow Paste*,
+which can't be answered remotely; usbmuxd can wedge (lockdown error -8) after scrcrappy's USB reset while
+the phone is locked.
 
 ## 3. Other open items
 
