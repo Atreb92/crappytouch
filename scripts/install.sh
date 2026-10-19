@@ -8,7 +8,7 @@ DEB=$(ls -t packages/*.deb | head -1)
 USER_AT=${PHONE_USER:-mobile}@127.0.0.1
 python3 scripts/usb-forward.py 2222 22 >/dev/null 2>&1 &
 FWD=$!
-trap 'kill $FWD' EXIT
+trap 'kill $FWD 2>/dev/null || true' EXIT
 sleep 0.5
 SSH="-p 2222 -o StrictHostKeyChecking=accept-new"
 scp -P 2222 -o StrictHostKeyChecking=accept-new "$DEB" "$USER_AT:/tmp/scrcrappy-agent.deb"
