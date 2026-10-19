@@ -4,7 +4,7 @@ What is still to be built for jailbreak input, and what else is open across both
 status + acceptance-criteria document; the detailed design and step-by-step plan it builds on are:
 
 - Design: `docs/superpowers/specs/2026-10-19-scrcrappy-agent-design.md` (approved)
-- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–7 done)
+- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–8 done)
 - Wire protocol: `PROTOCOL.md`
 - Acceptance tests: `tests/test_conformance.py` (run with `.venv/bin/pytest -m phone -s`)
 
@@ -18,7 +18,7 @@ status + acceptance-criteria document; the detailed design and step-by-step plan
 | Tweak loads into SpringBoard on the iPhone 8 | Confirmed (server answers on 7330) |
 | Reference client + pure tests | Done — `client/agent_client.py`, 6 tests pass |
 | Conformance suite | all pass on the phone (Tasks 3–7) |
-| Agent features | Tasks 3–7 done; Task 8 (packaging, docs) **not started** |
+| Agent features | Tasks 3–8 done (v0.2.0) |
 | scrcrappy integration | **Not started** (building blocks `usbmux.py`, `geometry.to_device` are on scrcrappy `master`) |
 
 Test phone: iPhone 8, iOS 16.7.1, Dopamine (rootless) with ElleKit, Tweak Injection on, OpenSSH
@@ -74,7 +74,7 @@ any, has been seen working.
 - `screenshot`: lossless PNG of the real screen (real status bar), base64 in the reply.
 - Tests: screen info shape, screenshot is a PNG of the screen's pixel size.
 
-### 1.6 Packaging and docs (plan Task 8)
+### 1.6 Packaging and docs (plan Task 8) — done (v0.2.0; `PROTOCOL.md` is the full interface guide)
 - `control` metadata, README (what it does and deliberately doesn't, security model, install,
   pairing, revocation, dev loop), final `PROTOCOL.md`; version bump; arm64 + arm64e builds.
 
