@@ -276,6 +276,10 @@ Every app SpringBoard can open (like `frida-ps -Uai`), sorted by name: bundle id
 name, and `pid` only while the app is running. No daemons or other non-app processes. A few system
 apps without a home-screen icon are included (e.g. Siri, `com.apple.webapp`).
 
+`apps` and `open` are new in agent 0.3.0; an older agent replies `{"error":"unknown command"}` to
+both, so a computer can tell it needs updating. Reference client: `Agent.apps()` returns the list,
+`Agent.open_app(id)` raises `AgentError` with the error string.
+
 ### open — bring an app to the front
 
 ```json
@@ -316,6 +320,10 @@ print(a.request({"cmd": "screen"}))
 a.send({"cmd": "touch", "events": [{"finger": 1, "phase": "down", "x": 0.5, "y": 0.5}]})
 a.send({"cmd": "touch", "events": [{"finger": 1, "phase": "up", "x": 0.5, "y": 0.5}]})
 a.request({"cmd": "key", "page": 0x0C, "usage": 0x40})   # Home
+
+for app in a.apps():                          # like frida-ps -Uai
+    print(f"{app.get('pid', ''):>6}  {app['name']:<28} {app['id']}")
+a.open_app("com.apple.mobilenotes")           # AgentError("locked") on the lock screen
 ```
 
 ## 7. On the phone
