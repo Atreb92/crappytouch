@@ -29,6 +29,8 @@
 - (BOOL)launchApplicationWithIdentifier:(NSString *)bundleID suspended:(BOOL)suspended;
 @end
 
+#define OPEN_URL_TIMEOUT_S 5
+
 static SBApplicationController *Controller(void) {
     return [NSClassFromString(@"SBApplicationController") sharedInstance];
 }
@@ -65,5 +67,23 @@ NSString *SAOpenApp(NSString *bundleID) {
         else if (![UIApplication.sharedApplication launchApplicationWithIdentifier:bundleID suspended:NO])
             error = @"open failed";
     });
+    return error;
+}
+
+NSString *SAOpenURL(NSString *url) {
+    NSURL *parsed = [url isKindOfClass:NSString.class] ? [NSURL URLWithString:url] : nil;
+    if (!parsed.scheme) return @"bad url";
+
+    __block NSString *error = nil;
+    dispatch_semaphore_t done = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_main_queue(), ^{ // completion also lands on the main queue; the client thread waits
+        if (SAPhoneLocked()) { error = @"locked"; dispatch_semaphore_signal(done); return; }
+        [UIApplication.sharedApplication openURL:parsed options:@{} completionHandler:^(BOOL ok) {
+            if (!ok) error = @"open failed";
+            dispatch_semaphore_signal(done);
+        }];
+    });
+    if (dispatch_semaphore_wait(done, dispatch_time(DISPATCH_TIME_NOW, OPEN_URL_TIMEOUT_S * NSEC_PER_SEC)))
+        return @"open failed"; // no answer in time
     return error;
 }

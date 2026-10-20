@@ -102,6 +102,10 @@ static NSDictionary *HandleCommand(NSString *cmd, NSDictionary *msg, NSMutableIn
         NSString *error = [bundleID isKindOfClass:NSString.class] ? SAOpenApp(bundleID) : @"unknown app";
         return error ? @{@"error": error} : @{@"ok": @YES};
     }
+    if ([cmd isEqual:@"open_url"]) {
+        NSString *error = SAOpenURL(msg[@"url"]);
+        return error ? @{@"error": error} : @{@"ok": @YES};
+    }
     return @{@"error": @"unknown command"};
 }
 

@@ -14,6 +14,7 @@ Dopamine) that lets a computer running
 - **Screen**: size, scale and orientation, and lossless PNG screenshots with the real status bar.
 - **Apps**: list the installed apps (with the PID of the running ones) and open one by bundle
   identifier.
+- **Open URL**: open a link or deeplink (`https:`, `tel:`, `maps:`, app schemes).
 - **Keep awake**: optionally stop the phone auto-locking while a computer is connected (Settings ›
   scrcrappy-agent).
 

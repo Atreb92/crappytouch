@@ -203,6 +203,15 @@ def test_open_unknown_app_errors(agent):
         agent.open_app("com.example.not-installed")
 
 
+def test_open_url_bad_errors(agent):
+    with pytest.raises(ac.AgentError, match="bad url"):
+        agent.open_url("not a url")
+
+
+def test_open_url_returns_ok(agent):  # manual: Safari opens the page
+    agent.open_url("https://example.com")
+
+
 def test_open_settings_runs_it(agent):
     agent.open_app("com.apple.Preferences")
     time.sleep(2)

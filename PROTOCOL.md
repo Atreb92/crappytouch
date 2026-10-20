@@ -292,6 +292,18 @@ won't open apps over the lock screen; unlock first) | `{"error":"open failed"}`.
 Like tapping its icon: launches the app if needed. The reply comes once SpringBoard has started the
 switch, before the app has finished drawing.
 
+### open_url — open a URL or deeplink
+
+```json
+{"cmd": "open_url", "url": "https://example.com"}
+```
+
+→ `{"ok":true}` | `{"error":"bad url"}` (not a URL, or no scheme) | `{"error":"locked"}` |
+`{"error":"open failed"}` (nothing handles it, or no answer in 5 s).
+
+Like tapping a link: opens `https:`, `tel:`, `maps:`, app deeplinks, etc. in whatever app handles the
+scheme. Reference client: `Agent.open_url(url)`. New in agent 0.5.0.
+
 ### Anything else
 
 An unknown `cmd` → `{"error":"unknown command"}`; a request without a string `cmd` →
