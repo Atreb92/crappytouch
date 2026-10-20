@@ -1,17 +1,14 @@
 # crappytouch
 
-A SpringBoard tweak for rootless jailbreaks (built for iOS 15–16; tested on an iPhone 8, iOS 16.7.1,
-Dopamine) that lets a computer running
+A SpringBoard tweak for rootless jailbreaks that lets a computer running
 [scrcrappy](https://github.com/Atreb92/scrcrappy) control the iPhone over USB.
 
 ## Requirements
 
 On the iPhone:
 
-- A **rootless jailbreak** (`/var/jb`). Tested on **Dopamine** (iPhone 8, iOS 16.7.1); built for
-  iOS 15–16.
-- An injection runtime: **ElleKit** (ships with Dopamine) or any MobileSubstrate-compatible one
-  (`mobilesubstrate | ellekit`).
+- A **rootless jailbreak** (`/var/jb`).
+- An injection runtime: **ElleKit** or any MobileSubstrate-compatible one (`mobilesubstrate | ellekit`).
 - **PreferenceLoader** — for the Settings › crappytouch pane (the keep-awake switch).
 - **OpenSSH** (from Sileo) — used by `scripts/install.sh` to install over USB, and to forget paired
   computers (delete `hosts.plist`).
@@ -19,8 +16,15 @@ On the iPhone:
 The package depends on these, so a package manager (Sileo) pulls the first three in automatically.
 On the computer side you only need USB access (usbmuxd) and Python 3 — see Build and Install below.
 
-**Tested:** iPhone 8, iOS 16.7.1 (Dopamine). Other rootless devices and iOS 15–16 versions should
-work but aren't verified yet.
+## Compatibility
+
+Built for iOS 15–16. Tested on:
+
+| Device | iOS | Jailbreak |
+|--------|-----|-----------|
+| iPhone 8 | 16.7.1 | Dopamine |
+
+Other rootless devices and iOS 15–16 versions should work but aren't verified yet.
 
 ## What it does
 
