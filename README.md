@@ -9,9 +9,11 @@ On the iPhone, a rootless jailbreak with:
 
 - **ElleKit**
 - **PreferenceLoader**
+- **OpenSSH**
 
-Both are pulled in automatically when you install the package with Sileo. On the computer side you
-only need USB access (usbmuxd) and Python 3 — see Build and Install below.
+ElleKit and PreferenceLoader are pulled in automatically when you install the package with Sileo;
+OpenSSH you install from Sileo. On the computer side you only need USB access (usbmuxd) and Python 3
+— see Build and Install below.
 
 ## Compatibility
 
