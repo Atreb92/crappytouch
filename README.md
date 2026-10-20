@@ -44,7 +44,7 @@ On the iPhone, a rootless jailbreak with:
 
 ElleKit and PreferenceLoader are pulled in automatically when you install the package with Sileo;
 OpenSSH you install from Sileo. On the computer side you only need USB access (usbmuxd) and Python 3
-— see Build and Install below.
+— see Install below.
 
 ## Security model
 
@@ -58,7 +58,7 @@ OpenSSH you install from Sileo. On the computer side you only need USB access (u
 
 ## Using it
 
-1. Install the package (below) and open scrcrappy with the agent backend.
+1. Install the package ([below](#install)) and open scrcrappy with the agent backend.
 2. **Pair**: unlock the phone. The first time, the phone asks *Allow “‹computer›” to control this
    iPhone?* — check that the code matches the one scrcrappy shows, then tap **Allow**.
 3. **After each reboot, touch the screen once** before the computer can send touches (the agent
@@ -77,7 +77,21 @@ on the phone (e.g. over SSH). Each computer has to pair again.
 **Talking to it from your own code**: see [`PROTOCOL.md`](PROTOCOL.md) — every command, with
 examples — and the reference client `client/agent_client.py` (Python stdlib).
 
-## Build (Fedora)
+## Install
+
+### From Sileo (recommended)
+
+1. In Sileo, go to Sources › **+** and add `https://atreb92.github.io/crappytouch/`.
+2. Install **crappytouch**. ElleKit and PreferenceLoader come along as dependencies.
+3. Respring.
+
+### From a .deb
+
+Download `com.atreb92.crappytouch_<version>_iphoneos-arm64.deb` from the
+[latest release](https://github.com/Atreb92/crappytouch/releases/latest) and install it with
+`dpkg -i`, then respring.
+
+### From source (Fedora)
 
 ```sh
 sudo dnf install -y fakeroot perl rsync zip git xz
@@ -86,21 +100,19 @@ make package                # debug build: packages/com.atreb92.crappytouch_<ver
 make package FINALPACKAGE=1 # release build (optimized, stripped): com.atreb92.crappytouch_<version>_iphoneos-arm64.deb
 ```
 
-Both contain arm64 and arm64e.
-
-## Install from Sileo
-
-Add the source `https://atreb92.github.io/crappytouch/` in Sileo (Sources → +), then install
-**crappytouch**. Maintainers: `make package FINALPACKAGE=1 && scripts/mkrepo.sh`, commit `repo/`.
-A workflow deploys it to GitHub Pages (Settings → Pages → Source: GitHub Actions).
-
-## Install on the phone
-
-Needs OpenSSH on the phone (Sileo). Run this **in your own terminal** — sudo on the phone asks for
-your password, which is never stored:
+Both contain arm64 and arm64e. To install on the phone over USB, run this **in your own terminal**
+(sudo on the phone asks for your password, which is never stored; needs OpenSSH on the phone):
 
 ```sh
 scripts/install.sh          # copies the newest .deb over USB, dpkg -i, resprings
+```
+
+### Publishing a release (maintainers)
+
+```sh
+make package FINALPACKAGE=1 && scripts/mkrepo.sh   # updates repo/ (the Sileo source)
+git add repo && git commit && git push             # a workflow deploys repo/ to GitHub Pages
+gh release create v<version> packages/com.atreb92.crappytouch_<version>_iphoneos-arm64.deb
 ```
 
 ## Tests
