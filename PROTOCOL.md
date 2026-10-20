@@ -301,8 +301,10 @@ switch, before the app has finished drawing.
 → `{"ok":true}` | `{"error":"bad url"}` (not a URL, or no scheme) | `{"error":"locked"}` |
 `{"error":"open failed"}` (nothing handles it, or no answer in 5 s).
 
-Like tapping a link: opens `https:`, `tel:`, `maps:`, app deeplinks, etc. in whatever app handles the
-scheme. Reference client: `Agent.open_url(url)`. New in agent 0.5.0.
+Like tapping a link: opens `https:`, `tel:`, `sms:`, `maps:`, app deeplinks, etc. in whatever app
+handles the scheme. iOS blocks a few schemes for third parties (notably `prefs:` Settings deep
+links), which come back as `open failed`; use `open` with `com.apple.Preferences` to open Settings
+itself. Reference client: `Agent.open_url(url)`. New in agent 0.5.0.
 
 ### Anything else
 

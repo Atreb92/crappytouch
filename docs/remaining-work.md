@@ -113,6 +113,24 @@ the phone is locked.
 - scrcrappy: `scrcrappy agent --apps` / `--open <id>` and MCP tools `list_apps` / `open_app`.
   Plan Task 10.
 
+## 2c. Done after the agent shipped (0.4.0, 0.5.0; verified on the iPhone 8)
+
+- **Keep awake while connected (0.4.0)**: a *Keep Awake While Connected* switch in Settings ›
+  scrcrappy-agent. The agent holds an `SBIdleTimerGlobalCoordinator` disable assertion while ≥1
+  authenticated computer is connected; released on disconnect. Adds a PreferenceLoader bundle
+  (`layout/…`, `Depends: … preferenceloader`) with the scrcrappy icon.
+- **open_url (0.5.0)**: `{"cmd":"open_url","url":…}` via `-[UIApplication openURL:options:
+  completionHandler:]` from SpringBoard. Verified: `https:`, `tel:`, `sms:`, app schemes
+  (`music://`, `maps://?q=…`). iOS-restricted schemes like `prefs:root=…` correctly return
+  `open failed` (LaunchServices blocks third-party `prefs:` deep links; `open com.apple.Preferences`
+  still works).
+- **Clipboard prompt — investigated, left as is**: dumped every pasteboard class in SpringBoard. The
+  copy prompt behind `clipboard_get` can't be removed safely — every daemon read of cross-app data
+  takes an *authentication message*, which is exactly what raises *Allow Paste*; no prompt-free read
+  exists. Only a forged auth message or patching the pasteboard daemon would suppress it, both of
+  which defeat the privacy gate / break "no code outside SpringBoard". The paste prompt behind `text`
+  can instead be avoided by typing characters directly via IOKit (not yet built).
+
 ## 3. Other open items
 
 - **Sileo repo (later, after the agent is verified)**: static repo (`.deb` + `Packages*` from
