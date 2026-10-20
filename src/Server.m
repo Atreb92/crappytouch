@@ -21,6 +21,7 @@
 #define SEND_TIMEOUT_S 10                 // a computer that stops reading can't block its thread forever
 #define AUTH_TIMEOUT_S 10                 // ponytail: per read, not a deadline; a byte trickler keeps a slot, cap covers it
 
+static void DropRevokedSessions(void);
 static atomic_int clientCount;
 static NSMutableDictionary<NSNumber *, NSString *> *live; // fd -> host id of each authenticated session; @synchronized
 
@@ -164,6 +165,8 @@ static void ServeClient(int fd) {
     SetWriteTimeout(fd, SEND_TIMEOUT_S);
     NSNumber *key = @(fd);
     @synchronized(live) { live[key] = hostID; }
+    DropRevokedSessions(); // a revoke that landed before we were registered
+    time_t lastTouch = time(NULL);
     NSMutableIndexSet *held = [NSMutableIndexSet indexSet];
     CTAwakeConnected();
     @try {
@@ -171,12 +174,12 @@ static void ServeClient(int fd) {
             SetReadTimeout(fd, held.count ? HELD_TIMEOUT_S : 0);
             BOOL idle = NO;
             NSDictionary *msg = ReadFrame(fd, MAX_FRAME, &idle);
-            if (!msg) {
-                if (!idle) return;
-                CTTouchRelease(held); // silent with a finger down: lift it, keep the connection
-                continue;
-            }
+            if (!msg && !idle) return;
+            // no touch for HELD_TIMEOUT_S with a finger down (other traffic doesn't count): lift it, keep the connection
+            if (held.count && time(NULL) - lastTouch >= HELD_TIMEOUT_S) CTTouchRelease(held);
+            if (!msg) continue;
             NSString *cmd = msg[@"cmd"];
+            if ([cmd isEqual:@"touch"]) lastTouch = time(NULL);
             NSDictionary *reply = [cmd isKindOfClass:NSString.class] ? HandleCommand(cmd, msg, held)
                                                                     : @{@"error": @"missing cmd"};
             if (reply && !WriteFrame(fd, reply)) return;
@@ -219,8 +222,10 @@ static void AcceptLoop(int listener) {
 // Settings removed a computer: cut the live sessions of every host that is no longer paired. shutdown() makes
 // the session thread's read fail, so its normal teardown lifts held fingers.
 static void DropRevokedSessions(void) {
+    NSArray *hosts = CTAuthListHosts();
+    if (!hosts) return; // unreadable file: don't cut everyone off over it
     NSMutableSet *paired = [NSMutableSet set];
-    for (NSDictionary *h in CTAuthListHosts()) [paired addObject:h[@"id"]];
+    for (NSDictionary *h in hosts) [paired addObject:h[@"id"]];
     @synchronized(live) {
         [live enumerateKeysAndObjectsUsingBlock:^(NSNumber *fd, NSString *hostID, BOOL *stop) {
             if (![paired containsObject:hostID]) shutdown(fd.intValue, SHUT_RDWR);

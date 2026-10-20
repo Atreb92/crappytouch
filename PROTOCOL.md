@@ -151,8 +151,8 @@ computer never needs device units.
 - `down` on a finger that is already down counts as `move`. `move` or `up` on a finger that isn't
   down is ignored. Invalid events are dropped silently.
 - Fingers a connection still holds down when it closes are lifted automatically. So are fingers it
-  holds while it sends nothing for 10 s (the connection stays open): to hold longer, repeat a
-  `move` now and then.
+  holds when it sends no `touch` for 10 s (the connection stays open, whatever else it sends): to
+  hold longer, repeat a `move` now and then.
 - **No reply, ever**, to keep latency low. To check where things stand, send `screen`: replies come
   in order, so its `fingers_down` reflects every earlier `touch`.
 - After the phone boots, the agent needs to see **one real touch** on the screen before it can

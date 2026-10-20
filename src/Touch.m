@@ -116,7 +116,8 @@ void CTTouch(NSArray *events, NSMutableIndexSet *held) {
             if (i < 1 || i > MAX_FINGER) continue;
             BOOL up = [phase isEqual:@"up"];
             if ((isnan(x) || isnan(y)) && !up) continue;
-            if (masks[i]) { // same finger twice in one message: deliver in order, not merged
+            BOOL applies = [phase isEqual:@"down"] || (([phase isEqual:@"move"] || up) && fingers[i].down);
+            if (applies && masks[i]) { // same finger twice in one message: deliver in order, not merged
                 Dispatch(masks);
                 memset(masks, 0, sizeof masks);
                 any = NO;

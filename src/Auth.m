@@ -79,6 +79,7 @@ BOOL CTAuthAddHost(NSString *name, NSData *secret) {
 
 NSArray<NSDictionary *> *CTAuthListHosts(void) {
     NSDictionary *hosts = [NSDictionary dictionaryWithContentsOfFile:HostsPath()];
+    if (!hosts) return nil;
     NSMutableArray *list = [NSMutableArray array];
     [hosts enumerateKeysAndObjectsUsingBlock:^(id hostID, id host, BOOL *stop) {
         NSString *name = [host isKindOfClass:NSDictionary.class] ? host[@"name"] : nil;

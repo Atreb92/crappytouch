@@ -18,7 +18,7 @@ BOOL CTAuthAddHost(NSString *name, NSData *secret);
 // Posted (Darwin) by the Settings bundle after it removes a computer; the tweak then drops that computer's sessions.
 #define CT_REVOKED_NOTIFICATION "com.atreb92.crappytouch.revoked"
 
-// Paired computers as @{@"id", @"name"}, sorted by name; empty if hosts.plist is missing or unreadable.
+// Paired computers as @{@"id", @"name"}, sorted by name; nil if hosts.plist is missing or unreadable (@[] = none paired).
 NSArray<NSDictionary *> *CTAuthListHosts(void);
 
 // Forgets one computer. NO (and nothing written) if `hostID` isn't paired or hosts.plist can't be written.

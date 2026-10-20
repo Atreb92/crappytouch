@@ -165,6 +165,14 @@ def test_held_finger_released_after_silence(agent):  # a stalled computer must n
     assert agent.request({"cmd": "screen"})["fingers_down"] == 0  # released, connection still open
 
 
+def test_held_finger_released_even_if_other_commands_keep_coming(agent):  # polling must not keep a finger pressed
+    agent.send({"cmd": "touch", "events": [{"finger": 3, "phase": "down", "x": 0.98, "y": 0.5}]})
+    for _ in range(7):
+        time.sleep(2)
+        fingers = agent.request({"cmd": "screen"})["fingers_down"]
+    assert fingers == 0
+
+
 def test_down_and_up_in_one_message_leaves_nothing_down(agent):
     agent.send({"cmd": "touch", "events": [{"finger": 3, "phase": "down", "x": 0.98, "y": 0.5},
                                            {"finger": 3, "phase": "up", "x": 0.98, "y": 0.5}]})
