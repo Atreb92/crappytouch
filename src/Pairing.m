@@ -47,7 +47,7 @@ NSString *CTPair(NSString *name, NSData *secret) {
     if (atomic_exchange(&pending, true)) return @"busy";
 
     // decided / allowed / window are only touched on the main queue, so a tap racing the timeout is safe
-    __block BOOL decided = NO, allowed = NO, locked = NO;
+    __block BOOL decided = NO, allowed = NO, allowedFinal = NO, locked = NO;
     __block UIWindow *window = nil;
     dispatch_semaphore_t answered = dispatch_semaphore_create(0);
     NSString *code = PairingCode(secret);
@@ -73,12 +73,13 @@ NSString *CTPair(NSString *name, NSData *secret) {
     if (!locked) dispatch_semaphore_wait(answered, dispatch_time(DISPATCH_TIME_NOW, TIMEOUT_S * NSEC_PER_SEC));
     dispatch_sync(dispatch_get_main_queue(), ^{
         decided = YES; // a tap after the timeout counts as nothing
+        allowedFinal = allowed;
         [window.rootViewController dismissViewControllerAnimated:NO completion:nil];
         window.hidden = YES;
         window = nil;
     });
 
-    NSString *error = locked ? @"locked" : !allowed ? @"denied" : CTAuthAddHost(name, secret) ? nil : @"can't save host";
+    NSString *error = locked ? @"locked" : !allowedFinal ? @"denied" : CTAuthAddHost(name, secret) ? nil : @"can't save host";
     os_log(OS_LOG_DEFAULT, "crappytouch: pair %{public}@: %{public}@", name, error ?: @"allowed");
     atomic_store(&pending, false);
     return error;

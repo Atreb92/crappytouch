@@ -89,6 +89,12 @@ def test_pair_deny():
         a.pair(HOST + "-deny-test", s)
 
 
+def test_pair_name_with_control_chars_refused():
+    for name in ("evil\nCode 000000 matches", "tab\there", "del\x7f"):
+        with pytest.raises(ac.AgentError, match="bad host name"):
+            connect().pair(HOST + name, secrets.token_bytes(32))
+
+
 def test_second_pair_while_pending_is_busy():
     s1, s2 = secrets.token_bytes(32), secrets.token_bytes(32)
     print(f"\n>>> On the phone: an alert appears (code {ac.pairing_code(s1)}): tap DENY")

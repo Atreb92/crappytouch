@@ -136,7 +136,8 @@ static void ServeClient(int fd) {
         } else if ([cmd isEqual:@"pair"]) {
             NSString *name = msg[@"host"];
             NSData *secret = CTUnhex(msg[@"secret"]);
-            NSString *error = ![name isKindOfClass:NSString.class] || !name.length || name.length > 64 ? @"bad host name"
+            NSString *error = ![name isKindOfClass:NSString.class] || !name.length || name.length > 64 ||
+                              [name rangeOfCharacterFromSet:NSCharacterSet.controlCharacterSet].location != NSNotFound ? @"bad host name"
                             : secret.length != 32 ? @"bad secret"
                             : CTPair(name, secret);
             if (!WriteFrame(fd, error ? @{@"error": error} : @{@"ok": @YES})) return;
