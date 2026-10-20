@@ -2,7 +2,7 @@
 
 A SpringBoard tweak for rootless jailbreaks (built for iOS 15–16; tested on an iPhone 8, iOS 16.7.1,
 Dopamine) that lets a computer running
-[scrcrappy](../scrcrappy) control the iPhone over USB.
+[scrcrappy](https://github.com/Atreb92/scrcrappy) control the iPhone over USB.
 
 ## What it does
 
