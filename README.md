@@ -5,16 +5,13 @@ A SpringBoard tweak for rootless jailbreaks that lets a computer running
 
 ## Requirements
 
-On the iPhone:
+On the iPhone, a rootless jailbreak with:
 
-- A **rootless jailbreak** (`/var/jb`).
-- An injection runtime: **ElleKit** or any MobileSubstrate-compatible one (`mobilesubstrate | ellekit`).
-- **PreferenceLoader** — for the Settings › crappytouch pane (the keep-awake switch).
-- **OpenSSH** (from Sileo) — used by `scripts/install.sh` to install over USB, and to forget paired
-  computers (delete `hosts.plist`).
+- **ElleKit**
+- **PreferenceLoader**
 
-The package depends on these, so a package manager (Sileo) pulls the first three in automatically.
-On the computer side you only need USB access (usbmuxd) and Python 3 — see Build and Install below.
+Both are pulled in automatically when you install the package with Sileo. On the computer side you
+only need USB access (usbmuxd) and Python 3 — see Build and Install below.
 
 ## Compatibility
 
