@@ -11,6 +11,6 @@ FWD=$!
 trap 'kill $FWD 2>/dev/null || true' EXIT
 sleep 0.5
 SSH="-p 2222 -o StrictHostKeyChecking=accept-new"
-scp -P 2222 -o StrictHostKeyChecking=accept-new "$DEB" "$USER_AT:/tmp/scrcrappy-agent.deb"
-ssh -t $SSH "$USER_AT" "sudo dpkg -i /tmp/scrcrappy-agent.deb && rm /tmp/scrcrappy-agent.deb && killall -9 SpringBoard"
+scp -P 2222 -o StrictHostKeyChecking=accept-new "$DEB" "$USER_AT:/tmp/crappytouch.deb"
+ssh -t $SSH "$USER_AT" "sudo dpkg -i /tmp/crappytouch.deb && rm /tmp/crappytouch.deb && killall -9 SpringBoard"
 echo "installed $DEB"

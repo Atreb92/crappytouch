@@ -66,57 +66,57 @@ static void SetReadTimeout(int fd, int seconds) {
 // Commands after auth; nil = no reply (touch). `held` = fingers this connection holds down.
 static NSDictionary *HandleCommand(NSString *cmd, NSDictionary *msg, NSMutableIndexSet *held) {
     if ([cmd isEqual:@"touch"]) {
-        SATouch(msg[@"events"], held);
+        CTTouch(msg[@"events"], held);
         return nil;
     }
     if ([cmd isEqual:@"key"]) {
         id page = msg[@"page"] ?: @7, usage = msg[@"usage"], mods = msg[@"modifiers"] ?: @0;
         BOOL ok = [page isKindOfClass:NSNumber.class] && [usage isKindOfClass:NSNumber.class] &&
-                  [mods isKindOfClass:NSNumber.class] && SAKey([page integerValue], [usage integerValue], [mods integerValue]);
+                  [mods isKindOfClass:NSNumber.class] && CTKey([page integerValue], [usage integerValue], [mods integerValue]);
         return ok ? @{@"ok": @YES} : @{@"error": @"bad key"};
     }
     if ([cmd isEqual:@"text"] || [cmd isEqual:@"clipboard_set"]) {
         NSString *text = msg[@"text"];
         if (![text isKindOfClass:NSString.class]) return @{@"error": @"bad text"};
-        if ([cmd isEqual:@"clipboard_set"]) SAClipboardSet(text);
-        else if (!SAText(text)) return @{@"error": @"can't type"};
+        if ([cmd isEqual:@"clipboard_set"]) CTClipboardSet(text);
+        else if (!CTText(text)) return @{@"error": @"can't type"};
         return @{@"ok": @YES};
     }
     if ([cmd isEqual:@"clipboard_get"]) {
-        NSString *text = SAClipboardGet();
+        NSString *text = CTClipboardGet();
         return text ? @{@"ok": @YES, @"text": text} : @{@"error": @"clipboard timeout"};
     }
     if ([cmd isEqual:@"screen"]) {
-        NSMutableDictionary *r = [SAScreenInfo() mutableCopy];
-        [r addEntriesFromDictionary:@{@"ok": @YES, @"touch_ready": @(SATouchReady()),
-                                      @"fingers_down": @(SATouchFingersDown())}];
+        NSMutableDictionary *r = [CTScreenInfo() mutableCopy];
+        [r addEntriesFromDictionary:@{@"ok": @YES, @"touch_ready": @(CTTouchReady()),
+                                      @"fingers_down": @(CTTouchFingersDown())}];
         return r;
     }
     if ([cmd isEqual:@"screenshot"]) {
-        NSData *png = SAScreenshotPNG();
+        NSData *png = CTScreenshotPNG();
         return png ? @{@"ok": @YES, @"png": [png base64EncodedStringWithOptions:0]} : @{@"error": @"screenshot failed"};
     }
-    if ([cmd isEqual:@"apps"]) return @{@"ok": @YES, @"apps": SAApps()};
+    if ([cmd isEqual:@"apps"]) return @{@"ok": @YES, @"apps": CTApps()};
     if ([cmd isEqual:@"open"]) {
         NSString *bundleID = msg[@"id"];
-        NSString *error = [bundleID isKindOfClass:NSString.class] ? SAOpenApp(bundleID) : @"unknown app";
+        NSString *error = [bundleID isKindOfClass:NSString.class] ? CTOpenApp(bundleID) : @"unknown app";
         return error ? @{@"error": error} : @{@"ok": @YES};
     }
     if ([cmd isEqual:@"open_url"]) {
-        NSString *error = SAOpenURL(msg[@"url"]);
+        NSString *error = CTOpenURL(msg[@"url"]);
         return error ? @{@"error": error} : @{@"ok": @YES};
     }
     return @{@"error": @"unknown command"};
 }
 
 static void ServeClient(int fd) {
-    NSData *nonce = SARandomBytes(16);
+    NSData *nonce = CTRandomBytes(16);
     struct sockaddr_in local;
     socklen_t local_len = sizeof local;
     char addr[INET_ADDRSTRLEN] = "";
     if (getsockname(fd, (struct sockaddr *)&local, &local_len) == 0)
         inet_ntop(AF_INET, &local.sin_addr, addr, sizeof addr);
-    if (!nonce || !WriteFrame(fd, @{@"hello": @1, @"nonce": SAHex(nonce), @"addr": @(addr)})) return;
+    if (!nonce || !WriteFrame(fd, @{@"hello": @1, @"nonce": CTHex(nonce), @"addr": @(addr)})) return;
 
     SetReadTimeout(fd, AUTH_TIMEOUT_S);
     for (;;) { // until authenticated
@@ -124,21 +124,21 @@ static void ServeClient(int fd) {
         if (!msg) return;
         NSString *cmd = msg[@"cmd"];
         if ([cmd isEqual:@"auth"]) {
-            SAAuthResult r = SAAuthCheck(msg[@"id"], msg[@"mac"], nonce);
-            if (r != SAAuthOK) { // one try per nonce
-                WriteFrame(fd, @{@"error": r == SAAuthUnknownHost ? @"unknown host" : @"bad mac"});
+            CTAuthResult r = CTAuthCheck(msg[@"id"], msg[@"mac"], nonce);
+            if (r != CTAuthOK) { // one try per nonce
+                WriteFrame(fd, @{@"error": r == CTAuthUnknownHost ? @"unknown host" : @"bad mac"});
                 return;
             }
             if (!WriteFrame(fd, @{@"ok": @YES})) return;
-            os_log(OS_LOG_DEFAULT, "scrcrappy-agent: authenticated %{public}@",
+            os_log(OS_LOG_DEFAULT, "crappytouch: authenticated %{public}@",
                    [msg[@"host"] isKindOfClass:NSString.class] ? msg[@"host"] : @"?");
             break;
         } else if ([cmd isEqual:@"pair"]) {
             NSString *name = msg[@"host"];
-            NSData *secret = SAUnhex(msg[@"secret"]);
+            NSData *secret = CTUnhex(msg[@"secret"]);
             NSString *error = ![name isKindOfClass:NSString.class] || !name.length || name.length > 64 ? @"bad host name"
                             : secret.length != 32 ? @"bad secret"
-                            : SAPair(name, secret);
+                            : CTPair(name, secret);
             if (!WriteFrame(fd, error ? @{@"error": error} : @{@"ok": @YES})) return;
         } else {
             WriteFrame(fd, @{@"error": @"auth required"});
@@ -148,7 +148,7 @@ static void ServeClient(int fd) {
 
     SetReadTimeout(fd, 0);
     NSMutableIndexSet *held = [NSMutableIndexSet indexSet];
-    SAAwakeConnected();
+    CTAwakeConnected();
     @try {
         for (NSDictionary *msg; (msg = ReadFrame(fd, MAX_FRAME));) {
             NSString *cmd = msg[@"cmd"];
@@ -157,8 +157,8 @@ static void ServeClient(int fd) {
             if (reply && !WriteFrame(fd, reply)) return;
         }
     } @finally { // a finger left down would block the whole screen
-        SATouchRelease(held);
-        SAAwakeDisconnected();
+        CTTouchRelease(held);
+        CTAwakeDisconnected();
     }
 }
 
@@ -181,7 +181,7 @@ static void AcceptLoop(int listener) {
                 @try {
                     ServeClient(fd);
                 } @catch (NSException *e) { // never take SpringBoard down because of a client
-                    os_log_error(OS_LOG_DEFAULT, "scrcrappy-agent: %{public}@", e);
+                    os_log_error(OS_LOG_DEFAULT, "crappytouch: %{public}@", e);
                 }
             }
             close(fd);
@@ -190,17 +190,17 @@ static void AcceptLoop(int listener) {
     }
 }
 
-void SAServerStart(void) {
+void CTServerStart(void) {
     int listener = socket(AF_INET, SOCK_STREAM, 0);
     int one = 1;
     setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &one, sizeof one);
-    struct sockaddr_in sa = {.sin_len = sizeof sa, .sin_family = AF_INET, .sin_port = htons(SA_PORT),
+    struct sockaddr_in sa = {.sin_len = sizeof sa, .sin_family = AF_INET, .sin_port = htons(CT_PORT),
                              .sin_addr.s_addr = htonl(INADDR_LOOPBACK)};
     if (listener < 0 || bind(listener, (struct sockaddr *)&sa, sizeof sa) || listen(listener, 8)) {
-        os_log_error(OS_LOG_DEFAULT, "scrcrappy-agent: can't listen on 127.0.0.1:%d: %{errno}d", SA_PORT, errno);
+        os_log_error(OS_LOG_DEFAULT, "crappytouch: can't listen on 127.0.0.1:%d: %{errno}d", CT_PORT, errno);
         if (listener >= 0) close(listener);
         return;
     }
-    os_log(OS_LOG_DEFAULT, "scrcrappy-agent: listening on 127.0.0.1:%d", SA_PORT);
+    os_log(OS_LOG_DEFAULT, "crappytouch: listening on 127.0.0.1:%d", CT_PORT);
     [NSThread detachNewThreadWithBlock:^{ AcceptLoop(listener); }];
 }

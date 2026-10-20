@@ -7,12 +7,12 @@
 		<key>cell</key>
 		<string>PSLinkCell</string>
 		<key>label</key>
-		<string>scrcrappy-agent</string>
+		<string>crappytouch</string>
 		<key>icon</key>
-		<string>scrcrappyagent.png</string>
+		<string>crappytouch.png</string>
 	</dict>
 	<key>title</key>
-	<string>scrcrappy-agent</string>
+	<string>crappytouch</string>
 	<key>items</key>
 	<array>
 		<dict>
@@ -27,13 +27,13 @@
 			<key>label</key>
 			<string>Keep Awake While Connected</string>
 			<key>defaults</key>
-			<string>dev.scrcrappy.agent</string>
+			<string>com.atreb92.crappytouch</string>
 			<key>key</key>
 			<string>keepAwake</string>
 			<key>default</key>
 			<false/>
 			<key>PostNotification</key>
-			<string>dev.scrcrappy.agent.prefs</string>
+			<string>com.atreb92.crappytouch.prefs</string>
 		</dict>
 	</array>
 </dict>

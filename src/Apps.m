@@ -42,7 +42,7 @@ static BOOL Openable(SBApplication *app) {
     return app.bundleIdentifier && ![tags containsObject:@"hidden"];
 }
 
-NSArray<NSDictionary *> *SAApps(void) {
+NSArray<NSDictionary *> *CTApps(void) {
     NSMutableArray *apps = [NSMutableArray array];
     dispatch_sync(dispatch_get_main_queue(), ^{
         for (SBApplication *app in Controller().allApplications) {
@@ -58,26 +58,26 @@ NSArray<NSDictionary *> *SAApps(void) {
     return apps;
 }
 
-NSString *SAOpenApp(NSString *bundleID) {
+NSString *CTOpenApp(NSString *bundleID) {
     __block NSString *error = nil;
     dispatch_sync(dispatch_get_main_queue(), ^{
         SBApplication *app = [Controller() applicationWithBundleIdentifier:bundleID];
         if (!app || !Openable(app)) error = @"unknown app";
-        else if (SAPhoneLocked()) error = @"locked";
+        else if (CTPhoneLocked()) error = @"locked";
         else if (![UIApplication.sharedApplication launchApplicationWithIdentifier:bundleID suspended:NO])
             error = @"open failed";
     });
     return error;
 }
 
-NSString *SAOpenURL(NSString *url) {
+NSString *CTOpenURL(NSString *url) {
     NSURL *parsed = [url isKindOfClass:NSString.class] ? [NSURL URLWithString:url] : nil;
     if (!parsed.scheme) return @"bad url";
 
     __block NSString *error = nil;
     dispatch_semaphore_t done = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{ // completion also lands on the main queue; the client thread waits
-        if (SAPhoneLocked()) { error = @"locked"; dispatch_semaphore_signal(done); return; }
+        if (CTPhoneLocked()) { error = @"locked"; dispatch_semaphore_signal(done); return; }
         [UIApplication.sharedApplication openURL:parsed options:@{} completionHandler:^(BOOL ok) {
             if (!ok) error = @"open failed";
             dispatch_semaphore_signal(done);

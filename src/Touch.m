@@ -33,7 +33,7 @@ static long BootTime(void) {
 }
 
 static NSString *CachePath(void) {
-    return SAStatePath(@"touch.plist");
+    return CTStatePath(@"touch.plist");
 }
 
 static void OnHIDEvent(void *target, void *refcon, void *sender, IOHIDEventRef event) {
@@ -43,18 +43,18 @@ static void OnHIDEvent(void *target, void *refcon, void *sender, IOHIDEventRef e
     if (!sid) return;
     atomic_store(&senderID, sid);
     [@{@"senderID": @(sid), @"boot": @(BootTime())} writeToURL:[NSURL fileURLWithPath:CachePath()] error:NULL];
-    os_log(OS_LOG_DEFAULT, "scrcrappy-agent: touchscreen sender 0x%llx", sid);
+    os_log(OS_LOG_DEFAULT, "crappytouch: touchscreen sender 0x%llx", sid);
     dispatch_async(dispatch_get_main_queue(), ^{ // not from inside the callback
         IOHIDEventSystemClientUnregisterEventCallback(client);
         IOHIDEventSystemClientUnscheduleWithRunLoop(client, CFRunLoopGetMain(), kCFRunLoopDefaultMode);
     });
 }
 
-void SATouchStart(void) {
-    queue = dispatch_queue_create("scrcrappy-agent.touch", DISPATCH_QUEUE_SERIAL);
+void CTTouchStart(void) {
+    queue = dispatch_queue_create("crappytouch.touch", DISPATCH_QUEUE_SERIAL);
     client = IOHIDEventSystemClientCreate(kCFAllocatorDefault);
     if (!client) {
-        os_log_error(OS_LOG_DEFAULT, "scrcrappy-agent: no HID event system client, touch disabled");
+        os_log_error(OS_LOG_DEFAULT, "crappytouch: no HID event system client, touch disabled");
         return;
     }
     NSDictionary *cache = [NSDictionary dictionaryWithContentsOfFile:CachePath()];
@@ -66,7 +66,7 @@ void SATouchStart(void) {
     IOHIDEventSystemClientRegisterEventCallback(client, OnHIDEvent, NULL, NULL);
 }
 
-BOOL SATouchReady(void) {
+BOOL CTTouchReady(void) {
     return atomic_load(&senderID) != 0;
 }
 
@@ -103,8 +103,8 @@ static double Fraction(id v) {
     return isnan(d) ? NAN : fmin(fmax(d, 0), 1);
 }
 
-void SATouch(NSArray *events, NSMutableIndexSet *held) {
-    if (![events isKindOfClass:NSArray.class] || !SATouchReady()) return;
+void CTTouch(NSArray *events, NSMutableIndexSet *held) {
+    if (![events isKindOfClass:NSArray.class] || !CTTouchReady()) return;
     dispatch_async(queue, ^{
         uint32_t masks[MAX_FINGER + 1] = {0};
         BOOL any = NO;
@@ -134,7 +134,7 @@ void SATouch(NSArray *events, NSMutableIndexSet *held) {
     });
 }
 
-void SATouchRelease(NSMutableIndexSet *held) {
+void CTTouchRelease(NSMutableIndexSet *held) {
     if (!queue) return;
     dispatch_sync(queue, ^{
         if (!held.count) return;
@@ -148,7 +148,7 @@ void SATouchRelease(NSMutableIndexSet *held) {
     });
 }
 
-NSUInteger SATouchFingersDown(void) {
+NSUInteger CTTouchFingersDown(void) {
     if (!queue) return 0;
     __block NSUInteger n = 0;
     dispatch_sync(queue, ^{

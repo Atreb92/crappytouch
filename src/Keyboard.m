@@ -8,7 +8,7 @@ static void Send(IOHIDEventSystemClientRef client, uint32_t page, uint32_t usage
     CFRelease(e);
 }
 
-BOOL SAKey(NSInteger page, NSInteger usage, NSInteger modifiers) {
+BOOL CTKey(NSInteger page, NSInteger usage, NSInteger modifiers) {
     static IOHIDEventSystemClientRef client;
     static dispatch_once_t once;
     dispatch_once(&once, ^{ client = IOHIDEventSystemClientCreate(kCFAllocatorDefault); });

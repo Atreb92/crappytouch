@@ -227,7 +227,7 @@ def test_open_while_locked_says_locked(agent, request):
         agent.open_app("com.apple.Preferences")
 
 
-# --- keep awake while connected (Settings › scrcrappy-agent)
+# --- keep awake while connected (Settings › crappytouch)
 
 @pytest.mark.awake
 def test_keep_awake_while_connected(agent, request):

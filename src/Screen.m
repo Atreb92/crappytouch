@@ -7,7 +7,7 @@ UIImage *_UICreateScreenUIImage(void) NS_RETURNS_RETAINED; // private UIKit: the
 - (UIInterfaceOrientation)activeInterfaceOrientation; // SpringBoard: the frontmost app's
 @end
 
-NSDictionary *SAScreenInfo(void) {
+NSDictionary *CTScreenInfo(void) {
     __block NSDictionary *info;
     dispatch_sync(dispatch_get_main_queue(), ^{
         UIScreen *screen = UIScreen.mainScreen;
@@ -21,7 +21,7 @@ NSDictionary *SAScreenInfo(void) {
     return info;
 }
 
-NSData *SAScreenshotPNG(void) {
+NSData *CTScreenshotPNG(void) {
     __block UIImage *image;
     dispatch_sync(dispatch_get_main_queue(), ^{ image = _UICreateScreenUIImage(); });
     return image ? UIImagePNGRepresentation(image) : nil; // encoding off the main thread

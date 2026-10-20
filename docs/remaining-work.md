@@ -3,8 +3,8 @@
 What is still to be built for jailbreak input, and what else is open across both repos. This is a
 status + acceptance-criteria document; the detailed design and step-by-step plan it builds on are:
 
-- Design: `docs/superpowers/specs/2026-10-19-scrcrappy-agent-design.md` (approved)
-- Plan: `docs/superpowers/plans/2026-10-19-scrcrappy-agent.md` (Tasks 1–8 done)
+- Design: `docs/superpowers/specs/2026-10-19-crappytouch-design.md` (approved)
+- Plan: `docs/superpowers/plans/2026-10-19-crappytouch.md` (Tasks 1–8 done)
 - Wire protocol: `PROTOCOL.md`
 - Acceptance tests: `tests/test_conformance.py` (run with `.venv/bin/pytest -m phone -s`)
 
@@ -24,7 +24,7 @@ status + acceptance-criteria document; the detailed design and step-by-step plan
 Test phone: iPhone 8, iOS 16.7.1, Dopamine (rootless) with ElleKit, Tweak Injection on, OpenSSH
 installed.
 
-## 1. scrcrappy-agent (this repo)
+## 1. crappytouch (this repo)
 
 Each item is done when its conformance tests pass against the real phone and the manual check, if
 any, has been seen working.
@@ -116,7 +116,7 @@ the phone is locked.
 ## 2c. Done after the agent shipped (0.4.0, 0.5.0; verified on the iPhone 8)
 
 - **Keep awake while connected (0.4.0)**: a *Keep Awake While Connected* switch in Settings ›
-  scrcrappy-agent. The agent holds an `SBIdleTimerGlobalCoordinator` disable assertion while ≥1
+  crappytouch. The agent holds an `SBIdleTimerGlobalCoordinator` disable assertion while ≥1
   authenticated computer is connected; released on disconnect. Adds a PreferenceLoader bundle
   (`layout/…`, `Depends: … preferenceloader`) with the scrcrappy icon.
 - **open_url (0.5.0)**: `{"cmd":"open_url","url":…}` via `-[UIApplication openURL:options:

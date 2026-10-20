@@ -4,15 +4,15 @@
 #import <rootless.h>
 #import <string.h>
 
-NSString *SAStatePath(NSString *file) {
-    NSString *dir = ROOT_PATH_NS(@"/var/mobile/Library/scrcrappy-agent");
+NSString *CTStatePath(NSString *file) {
+    NSString *dir = ROOT_PATH_NS(@"/var/mobile/Library/crappytouch");
     [NSFileManager.defaultManager createDirectoryAtPath:dir withIntermediateDirectories:YES
                                              attributes:@{NSFilePosixPermissions: @0700} error:NULL];
     return [dir stringByAppendingPathComponent:file];
 }
 
 static NSString *HostsPath(void) {
-    return SAStatePath(@"hosts.plist");
+    return CTStatePath(@"hosts.plist");
 }
 
 static NSData *SHA256WithPrefix(NSString *prefix, NSData *secret) {
@@ -23,19 +23,19 @@ static NSData *SHA256WithPrefix(NSString *prefix, NSData *secret) {
     return digest;
 }
 
-NSData *SARandomBytes(size_t n) {
+NSData *CTRandomBytes(size_t n) {
     NSMutableData *data = [NSMutableData dataWithLength:n];
     return SecRandomCopyBytes(kSecRandomDefault, n, data.mutableBytes) == errSecSuccess ? data : nil;
 }
 
-NSString *SAHex(NSData *data) {
+NSString *CTHex(NSData *data) {
     const uint8_t *b = data.bytes;
     NSMutableString *s = [NSMutableString stringWithCapacity:data.length * 2];
     for (NSUInteger i = 0; i < data.length; i++) [s appendFormat:@"%02x", b[i]];
     return s;
 }
 
-NSData *SAUnhex(NSString *hex) {
+NSData *CTUnhex(NSString *hex) {
     if (![hex isKindOfClass:NSString.class] || hex.length % 2) return nil;
     NSMutableData *data = [NSMutableData dataWithLength:hex.length / 2];
     uint8_t *out = data.mutableBytes;
@@ -49,25 +49,25 @@ NSData *SAUnhex(NSString *hex) {
     return data;
 }
 
-SAAuthResult SAAuthCheck(NSString *hostID, NSString *mac, NSData *nonce) {
-    if (![hostID isKindOfClass:NSString.class]) return SAAuthUnknownHost;
+CTAuthResult CTAuthCheck(NSString *hostID, NSString *mac, NSData *nonce) {
+    if (![hostID isKindOfClass:NSString.class]) return CTAuthUnknownHost;
     NSDictionary *hosts = [NSDictionary dictionaryWithContentsOfFile:HostsPath()];
     NSDictionary *host = hosts[hostID];
     NSData *key = [host isKindOfClass:NSDictionary.class] ? host[@"key"] : nil;
-    if (![key isKindOfClass:NSData.class]) return SAAuthUnknownHost;
+    if (![key isKindOfClass:NSData.class]) return CTAuthUnknownHost;
 
     uint8_t expected[CC_SHA256_DIGEST_LENGTH];
     CCHmac(kCCHmacAlgSHA256, key.bytes, key.length, nonce.bytes, nonce.length, expected);
-    NSData *got = SAUnhex(mac);
+    NSData *got = CTUnhex(mac);
     if (got.length != sizeof expected || timingsafe_bcmp(got.bytes, expected, sizeof expected))
-        return SAAuthBadMac;
-    return SAAuthOK;
+        return CTAuthBadMac;
+    return CTAuthOK;
 }
 
-BOOL SAAuthAddHost(NSString *name, NSData *secret) {
+BOOL CTAuthAddHost(NSString *name, NSData *secret) {
     NSMutableDictionary *hosts = [[NSDictionary dictionaryWithContentsOfFile:HostsPath()] mutableCopy]
                                  ?: [NSMutableDictionary dictionary];
-    hosts[SAHex(SHA256WithPrefix(@"scrcrappy-id", secret))] =
+    hosts[CTHex(SHA256WithPrefix(@"scrcrappy-id", secret))] =
         @{@"name": name, @"key": SHA256WithPrefix(@"scrcrappy-key", secret)};
     NSURL *url = [NSURL fileURLWithPath:HostsPath()];
     return [hosts writeToURL:url error:NULL] &&

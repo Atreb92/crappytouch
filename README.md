@@ -1,4 +1,4 @@
-# scrcrappy-agent
+# crappytouch
 
 A SpringBoard tweak for rootless jailbreaks (built for iOS 15–16; tested on an iPhone 8, iOS 16.7.1,
 Dopamine) that lets a computer running
@@ -16,7 +16,7 @@ Dopamine) that lets a computer running
   identifier.
 - **Open URL**: open a link or deeplink (`https:`, `tel:`, `maps:`, app schemes).
 - **Keep awake**: optionally stop the phone auto-locking while a computer is connected (Settings ›
-  scrcrappy-agent).
+  crappytouch).
 
 ## What it deliberately doesn't do
 
@@ -50,7 +50,7 @@ Expected prompts from iOS 16, not from the agent:
 - **Copy**: reading the phone's clipboard (scrcrappy's Copy) asks on the phone first when another app
   put the text there; the computer waits up to 30 s for the answer.
 
-**Forget all paired computers**: delete `/var/jb/var/mobile/Library/scrcrappy-agent/hosts.plist`
+**Forget all paired computers**: delete `/var/jb/var/mobile/Library/crappytouch/hosts.plist`
 on the phone (e.g. over SSH). Each computer has to pair again.
 
 **Talking to it from your own code**: see [`PROTOCOL.md`](PROTOCOL.md) — every command, with
@@ -61,8 +61,8 @@ examples — and the reference client `client/agent_client.py` (Python stdlib).
 ```sh
 sudo dnf install -y fakeroot perl rsync zip git xz
 scripts/setup-theos.sh      # Theos + iOS toolchain + iOS 16.5 SDK into ~/theos
-make package                # debug build: packages/dev.scrcrappy.agent_<version>-<n>+debug_iphoneos-arm64.deb
-make package FINALPACKAGE=1 # release build (optimized, stripped): dev.scrcrappy.agent_<version>_iphoneos-arm64.deb
+make package                # debug build: packages/com.atreb92.crappytouch_<version>-<n>+debug_iphoneos-arm64.deb
+make package FINALPACKAGE=1 # release build (optimized, stripped): com.atreb92.crappytouch_<version>_iphoneos-arm64.deb
 ```
 
 Both contain arm64 and arm64e.
@@ -87,12 +87,12 @@ The conformance suite runs in file order. The pairing tests ask you to tap **Den
 **Allow** on the phone (`-s` shows the prompts); later tests need this computer paired. Run them with
 the phone unlocked. Two tests change the phone's clipboard.
 
-Logs: `idevicesyslog -m scrcrappy-agent`.
+Logs: `idevicesyslog -m crappytouch`.
 
 ## Licence
 
 MIT.
 
 Credit to ZXTouch: it showed the way to inject touches on a jailbroken iPhone (IOHIDEvent digitizer
-events dispatched in SpringBoard). scrcrappy-agent follows the same technique as a clean rewrite and
+events dispatched in SpringBoard). crappytouch follows the same technique as a clean rewrite and
 contains none of its (GPLv3) code.

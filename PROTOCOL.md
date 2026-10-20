@@ -1,4 +1,4 @@
-# scrcrappy-agent protocol v1
+# crappytouch protocol v1
 
 How a computer talks to the agent: how to reach it, how to pair and authenticate, and every
 command with its request, reply and errors. `client/agent_client.py` implements all of it (Python
@@ -342,9 +342,9 @@ a.open_app("com.apple.mobilenotes")           # AgentError("locked") on the lock
 
 ## 7. On the phone
 
-- Paired computers live in `/var/jb/var/mobile/Library/scrcrappy-agent/hosts.plist` (directory mode
+- Paired computers live in `/var/jb/var/mobile/Library/crappytouch/hosts.plist` (directory mode
   700, file mode 600, owner `mobile`): `{ id: {name, key} }`. **Revoke all computers** by deleting
   that file; they'll need to pair again.
 - `touch.plist` in the same directory caches the touchscreen's ID for the current boot.
-- The agent logs to the system log with the prefix `scrcrappy-agent:` (`idevicesyslog -m
-  scrcrappy-agent`).
+- The agent logs to the system log with the prefix `crappytouch:` (`idevicesyslog -m
+  crappytouch`).

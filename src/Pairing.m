@@ -21,7 +21,7 @@ static NSString *PairingCode(NSData *secret) {
 }
 
 // Fails closed: if SpringBoard's lock manager isn't there, treat the phone as locked.
-BOOL SAPhoneLocked(void) {
+BOOL CTPhoneLocked(void) {
     Class mgr = NSClassFromString(@"SBLockScreenManager");
     if (![mgr respondsToSelector:@selector(sharedInstance)]) return YES;
     SBLockScreenManager *m = [mgr sharedInstance];
@@ -43,7 +43,7 @@ static UIWindow *AlertWindow(void) {
     return w;
 }
 
-NSString *SAPair(NSString *name, NSData *secret) {
+NSString *CTPair(NSString *name, NSData *secret) {
     if (atomic_exchange(&pending, true)) return @"busy";
 
     // decided / allowed / window are only touched on the main queue, so a tap racing the timeout is safe
@@ -52,7 +52,7 @@ NSString *SAPair(NSString *name, NSData *secret) {
     dispatch_semaphore_t answered = dispatch_semaphore_create(0);
     NSString *code = PairingCode(secret);
     dispatch_sync(dispatch_get_main_queue(), ^{
-        if ((locked = SAPhoneLocked())) return;
+        if ((locked = CTPhoneLocked())) return;
         window = AlertWindow();
         UIAlertController *alert = [UIAlertController
             alertControllerWithTitle:[NSString stringWithFormat:@"Allow “%@” to control this iPhone?", name]
@@ -78,8 +78,8 @@ NSString *SAPair(NSString *name, NSData *secret) {
         window = nil;
     });
 
-    NSString *error = locked ? @"locked" : !allowed ? @"denied" : SAAuthAddHost(name, secret) ? nil : @"can't save host";
-    os_log(OS_LOG_DEFAULT, "scrcrappy-agent: pair %{public}@: %{public}@", name, error ?: @"allowed");
+    NSString *error = locked ? @"locked" : !allowed ? @"denied" : CTAuthAddHost(name, secret) ? nil : @"can't save host";
+    os_log(OS_LOG_DEFAULT, "crappytouch: pair %{public}@: %{public}@", name, error ?: @"allowed");
     atomic_store(&pending, false);
     return error;
 }
