@@ -3,28 +3,6 @@
 A SpringBoard tweak for rootless jailbreaks that lets a computer running
 [scrcrappy](https://github.com/Atreb92/scrcrappy) control the iPhone over USB.
 
-## Requirements
-
-On the iPhone, a rootless jailbreak with:
-
-- **ElleKit**
-- **PreferenceLoader**
-- **OpenSSH**
-
-ElleKit and PreferenceLoader are pulled in automatically when you install the package with Sileo;
-OpenSSH you install from Sileo. On the computer side you only need USB access (usbmuxd) and Python 3
-— see Build and Install below.
-
-## Compatibility
-
-Built for iOS 15–16. Tested on:
-
-| Device | iOS | Jailbreak |
-|--------|-----|-----------|
-| iPhone 8 | 16.7.1 | Dopamine |
-
-Other rootless devices and iOS 15–16 versions should work but aren't verified yet.
-
 ## What it does
 
 - **Touch**: taps, drags and multi-finger gestures at exact positions.
@@ -45,6 +23,28 @@ Other rootless devices and iOS 15–16 versions should work but aren't verified 
 - No shell commands, scripts, file access, app installs or settings changes.
 - No code outside SpringBoard; no root, sudo rules, setuid binaries or re-signed apps; the install
   touches no other package's files.
+
+## Compatibility
+
+Built for iOS 15–16. Tested on:
+
+| Device | iOS | Jailbreak |
+|--------|-----|-----------|
+| iPhone 8 | 16.7.1 | Dopamine |
+
+Other rootless devices and iOS 15–16 versions should work but aren't verified yet.
+
+## Requirements
+
+On the iPhone, a rootless jailbreak with:
+
+- **ElleKit**
+- **PreferenceLoader**
+- **OpenSSH**
+
+ElleKit and PreferenceLoader are pulled in automatically when you install the package with Sileo;
+OpenSSH you install from Sileo. On the computer side you only need USB access (usbmuxd) and Python 3
+— see Build and Install below.
 
 ## Security model
 
