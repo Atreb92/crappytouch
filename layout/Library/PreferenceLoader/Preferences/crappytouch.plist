@@ -4,37 +4,16 @@
 <dict>
 	<key>entry</key>
 	<dict>
+		<key>bundle</key>
+		<string>crappytouchprefs</string>
 		<key>cell</key>
 		<string>PSLinkCell</string>
+		<key>detail</key>
+		<string>CTRootListController</string>
 		<key>label</key>
 		<string>crappytouch</string>
 		<key>icon</key>
 		<string>crappytouch.png</string>
 	</dict>
-	<key>title</key>
-	<string>crappytouch</string>
-	<key>items</key>
-	<array>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>While a paired computer is connected, the iPhone doesn't auto-lock.</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSwitchCell</string>
-			<key>label</key>
-			<string>Keep Awake While Connected</string>
-			<key>defaults</key>
-			<string>com.atreb92.crappytouch</string>
-			<key>key</key>
-			<string>keepAwake</string>
-			<key>default</key>
-			<false/>
-			<key>PostNotification</key>
-			<string>com.atreb92.crappytouch.prefs</string>
-		</dict>
-	</array>
 </dict>
 </plist>

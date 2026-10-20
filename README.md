@@ -71,8 +71,9 @@ Expected prompts from iOS 16, not from the agent:
 - **Copy**: reading the phone's clipboard (scrcrappy's Copy) asks on the phone first when another app
   put the text there; the computer waits up to 30 s for the answer.
 
-**Forget all paired computers**: delete `/var/jb/var/mobile/Library/crappytouch/hosts.plist`
-on the phone (e.g. over SSH). Each computer has to pair again.
+**Revoke a paired computer**: Settings › crappytouch › Paired Computers, swipe left on it and tap
+Revoke. It is disconnected at once and has to pair again. To forget all of them, delete
+`/var/jb/var/mobile/Library/crappytouch/hosts.plist` on the phone (e.g. over SSH).
 
 **Talking to it from your own code**: see [`PROTOCOL.md`](PROTOCOL.md) — every command, with
 examples — and the reference client `client/agent_client.py` (Python stdlib).

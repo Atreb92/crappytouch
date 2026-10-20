@@ -6,6 +6,7 @@ THEOS_PACKAGE_SCHEME := rootless
 THEOS_PLATFORM_DEB_COMPRESSION_TYPE := xz
 export PATH := $(CURDIR)/scripts/bin:$(PATH)
 INSTALL_TARGET_PROCESSES := SpringBoard
+SUBPROJECTS += crappytouchprefs
 
 include $(THEOS)/makefiles/common.mk
 
@@ -15,3 +16,4 @@ crappytouch_FRAMEWORKS := Security UIKit IOKit
 crappytouch_CFLAGS := -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
+include $(THEOS_MAKE_PATH)/aggregate.mk

@@ -348,8 +348,9 @@ a.open_app("com.apple.mobilenotes")           # AgentError("locked") on the lock
 ## 7. On the phone
 
 - Paired computers live in `/var/jb/var/mobile/Library/crappytouch/hosts.plist` (directory mode
-  700, file mode 600, owner `mobile`): `{ id: {name, key} }`. **Revoke all computers** by deleting
-  that file; they'll need to pair again.
+  700, file mode 600, owner `mobile`): `{ id: {name, key} }`. **Revoke a computer** in Settings ›
+  crappytouch › Paired Computers (swipe left): it is removed from the file and its open connections
+  are closed. Deleting the file revokes all computers; they'll need to pair again.
 - `touch.plist` in the same directory caches the touchscreen's ID for the current boot.
 - The agent logs to the system log with the prefix `crappytouch:` (`idevicesyslog -m
   crappytouch`).
