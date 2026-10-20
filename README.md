@@ -91,8 +91,11 @@ Logs: `idevicesyslog -m crappytouch`.
 
 ## Licence
 
-MIT.
+MIT, see [LICENSE](LICENSE).
 
-Credit to ZXTouch: it showed the way to inject touches on a jailbroken iPhone (IOHIDEvent digitizer
-events dispatched in SpringBoard). crappytouch follows the same technique as a clean rewrite and
-contains none of its (GPLv3) code.
+## Credits
+
+- [scrcrappy](https://github.com/Atreb92/scrcrappy): the computer-side companion that drives
+  crappytouch over USB; the Settings icon is rendered from its app icon.
+- ZXTouch: showed how touches can be injected from SpringBoard on a jailbroken iPhone. crappytouch
+  follows the same approach as a clean rewrite and contains none of its code.
