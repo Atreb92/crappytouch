@@ -17,28 +17,34 @@
 #define MAX_FRAME (16u << 20)
 #define MAX_FRAME_BEFORE_AUTH (64u << 10) // an unauthenticated client can't make SpringBoard allocate 16 MiB
 #define MAX_CLIENTS 8                     // one thread each
+#define HELD_TIMEOUT_S 10                 // a computer silent this long with a finger held has its fingers lifted
+#define SEND_TIMEOUT_S 10                 // a computer that stops reading can't block its thread forever
 #define AUTH_TIMEOUT_S 10                 // ponytail: per read, not a deadline; a byte trickler keeps a slot, cap covers it
 
 static atomic_int clientCount;
 
-static BOOL ReadExact(int fd, void *buf, size_t n) {
+// `timedOut`: set when SO_RCVTIMEO fired before the first byte (a quiet connection, not a broken frame).
+static BOOL ReadExact(int fd, void *buf, size_t n, BOOL *timedOut) {
     for (size_t got = 0; got < n;) {
         ssize_t r = recv(fd, (uint8_t *)buf + got, n - got, 0);
         if (r > 0) got += r;
         else if (r < 0 && errno == EINTR) continue;
-        else return NO; // EOF, error or SO_RCVTIMEO
+        else {
+            if (r < 0 && (errno == EAGAIN || errno == EWOULDBLOCK) && got == 0 && timedOut) *timedOut = YES;
+            return NO; // EOF, error or SO_RCVTIMEO
+        }
     }
     return YES;
 }
 
-// nil = close the connection (EOF, timeout, oversized, not a JSON object).
-static NSDictionary *ReadFrame(int fd, uint32_t max) {
+// nil = close the connection (EOF, timeout, oversized, not a JSON object), unless *idle: it was just quiet.
+static NSDictionary *ReadFrame(int fd, uint32_t max, BOOL *idle) {
     uint32_t len;
-    if (!ReadExact(fd, &len, 4)) return nil;
+    if (!ReadExact(fd, &len, 4, idle)) return nil;
     len = ntohl(len);
     if (len > max) return nil;
     NSMutableData *body = [NSMutableData dataWithLength:len];
-    if (!ReadExact(fd, body.mutableBytes, len)) return nil;
+    if (!ReadExact(fd, body.mutableBytes, len, NULL)) return nil;
     id obj = [NSJSONSerialization JSONObjectWithData:body options:0 error:NULL];
     return [obj isKindOfClass:NSDictionary.class] ? obj : nil;
 }
@@ -61,6 +67,11 @@ static BOOL WriteFrame(int fd, NSDictionary *obj) {
 static void SetReadTimeout(int fd, int seconds) {
     struct timeval tv = {.tv_sec = seconds};
     setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv);
+}
+
+static void SetWriteTimeout(int fd, int seconds) {
+    struct timeval tv = {.tv_sec = seconds};
+    setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof tv);
 }
 
 // Commands after auth; nil = no reply (touch). `held` = fingers this connection holds down.
@@ -120,7 +131,7 @@ static void ServeClient(int fd) {
 
     SetReadTimeout(fd, AUTH_TIMEOUT_S);
     for (;;) { // until authenticated
-        NSDictionary *msg = ReadFrame(fd, MAX_FRAME_BEFORE_AUTH);
+        NSDictionary *msg = ReadFrame(fd, MAX_FRAME_BEFORE_AUTH, NULL);
         if (!msg) return;
         NSString *cmd = msg[@"cmd"];
         if ([cmd isEqual:@"auth"]) {
@@ -147,11 +158,19 @@ static void ServeClient(int fd) {
         }
     }
 
-    SetReadTimeout(fd, 0);
+    SetWriteTimeout(fd, SEND_TIMEOUT_S);
     NSMutableIndexSet *held = [NSMutableIndexSet indexSet];
     CTAwakeConnected();
     @try {
-        for (NSDictionary *msg; (msg = ReadFrame(fd, MAX_FRAME));) {
+        for (;;) {
+            SetReadTimeout(fd, held.count ? HELD_TIMEOUT_S : 0);
+            BOOL idle = NO;
+            NSDictionary *msg = ReadFrame(fd, MAX_FRAME, &idle);
+            if (!msg) {
+                if (!idle) return;
+                CTTouchRelease(held); // silent with a finger down: lift it, keep the connection
+                continue;
+            }
             NSString *cmd = msg[@"cmd"];
             NSDictionary *reply = [cmd isKindOfClass:NSString.class] ? HandleCommand(cmd, msg, held)
                                                                     : @{@"error": @"missing cmd"};

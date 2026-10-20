@@ -152,6 +152,25 @@ def test_touch_no_reply_and_connection_stays_usable(agent):  # Task 5
     assert agent.request({"cmd": "screen"})["fingers_down"] == 0
 
 
+def test_touch_up_without_coordinates_releases(agent):  # review: an up with no x/y was dropped
+    agent.send({"cmd": "touch", "events": [{"finger": 3, "phase": "down", "x": 0.98, "y": 0.5}]})
+    agent.send({"cmd": "touch", "events": [{"finger": 3, "phase": "up"}]})
+    assert agent.request({"cmd": "screen"})["fingers_down"] == 0
+
+
+def test_held_finger_released_after_silence(agent):  # a stalled computer must not leave the screen pressed
+    agent.send({"cmd": "touch", "events": [{"finger": 3, "phase": "down", "x": 0.98, "y": 0.5}]})
+    assert agent.request({"cmd": "screen"})["fingers_down"] == 1
+    time.sleep(12)
+    assert agent.request({"cmd": "screen"})["fingers_down"] == 0  # released, connection still open
+
+
+def test_down_and_up_in_one_message_leaves_nothing_down(agent):
+    agent.send({"cmd": "touch", "events": [{"finger": 3, "phase": "down", "x": 0.98, "y": 0.5},
+                                           {"finger": 3, "phase": "up", "x": 0.98, "y": 0.5}]})
+    assert agent.request({"cmd": "screen"})["fingers_down"] == 0
+
+
 def test_disconnect_releases_fingers(secret):  # Task 5
     a = connect()
     a.auth(HOST, secret)

@@ -142,12 +142,17 @@ computer never needs device units.
 {"cmd": "touch", "events": [{"finger": 1, "phase": "down", "x": 0.5, "y": 0.5}]}
 ```
 
-- `finger` 1..10, `phase` `down` | `move` | `up`, `x` / `y` numbers (clamped to 0..1).
+- `finger` 1..10, `phase` `down` | `move` | `up`, `x` / `y` numbers (clamped to 0..1). `up` may omit `x` / `y`:
+  the finger lifts where it was.
 - All events in one command are delivered as **one multi-finger update**: a pinch step is one
-  command with a `move` for each finger.
+  command with a `move` for each finger. If a command has several events for the *same* finger
+  (a `down` and an `up`, say), they are applied in order, one update each, so a tap fits in one
+  command.
 - `down` on a finger that is already down counts as `move`. `move` or `up` on a finger that isn't
   down is ignored. Invalid events are dropped silently.
-- Fingers a connection still holds down when it closes are lifted automatically.
+- Fingers a connection still holds down when it closes are lifted automatically. So are fingers it
+  holds while it sends nothing for 10 s (the connection stays open): to hold longer, repeat a
+  `move` now and then.
 - **No reply, ever**, to keep latency low. To check where things stand, send `screen`: replies come
   in order, so its `fingers_down` reflects every earlier `touch`.
 - After the phone boots, the agent needs to see **one real touch** on the screen before it can

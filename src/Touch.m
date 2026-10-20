@@ -113,7 +113,14 @@ void CTTouch(NSArray *events, NSMutableIndexSet *held) {
             int i = [e[@"finger"] intValue];
             NSString *phase = e[@"phase"];
             double x = Fraction(e[@"x"]), y = Fraction(e[@"y"]);
-            if (i < 1 || i > MAX_FINGER || isnan(x) || isnan(y)) continue;
+            if (i < 1 || i > MAX_FINGER) continue;
+            BOOL up = [phase isEqual:@"up"];
+            if ((isnan(x) || isnan(y)) && !up) continue;
+            if (masks[i]) { // same finger twice in one message: deliver in order, not merged
+                Dispatch(masks);
+                memset(masks, 0, sizeof masks);
+                any = NO;
+            }
             if ([phase isEqual:@"down"] && !fingers[i].down) {
                 fingers[i].down = YES;
                 masks[i] |= kRange | kTouch | kIdentity | kPosition;
@@ -121,13 +128,15 @@ void CTTouch(NSArray *events, NSMutableIndexSet *held) {
             } else if ([phase isEqual:@"move"] || [phase isEqual:@"down"]) { // repeated down = move
                 if (!fingers[i].down) continue;
                 masks[i] |= kPosition;
-            } else if ([phase isEqual:@"up"] && fingers[i].down) {
+            } else if (up && fingers[i].down) {
                 fingers[i].down = NO;
                 masks[i] |= kRange | kTouch;
                 [held removeIndex:i];
             } else continue;
-            fingers[i].x = x;
-            fingers[i].y = y;
+            if (!isnan(x) && !isnan(y)) { // an up without x/y lifts the finger where it was
+                fingers[i].x = x;
+                fingers[i].y = y;
+            }
             any = YES;
         }
         if (any) Dispatch(masks);
