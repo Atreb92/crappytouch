@@ -10,6 +10,8 @@
 		<string>PSLinkCell</string>
 		<key>detail</key>
 		<string>CTRootListController</string>
+		<key>isController</key>
+		<true/>
 		<key>label</key>
 		<string>crappytouch</string>
 		<key>icon</key>

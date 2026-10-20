@@ -264,6 +264,16 @@ def test_keep_awake_while_connected(agent, request):
 
 # --- revoking a computer (Settings › crappytouch › Paired Computers)
 
+def eof(sock: socket.socket) -> bool:  # unlike closed(), a quiet open socket is not EOF
+    sock.settimeout(1)
+    try:
+        return sock.recv(1) == b""
+    except socket.timeout:
+        return False
+    except ConnectionResetError:
+        return True
+
+
 def test_revoked_host_is_disconnected_and_refused(agent, secret):
     s = secrets.token_bytes(32)
     name = HOST + "-revoke-test"
@@ -274,9 +284,9 @@ def test_revoked_host_is_disconnected_and_refused(agent, secret):
         a.auth(name, s)
     print(f'\n>>> On the phone: Settings > crappytouch > swipe "{name}" and tap Revoke (90 s)')
     deadline = time.time() + 90
-    while time.time() < deadline and not all(closed(a.sock) for a in sessions):
+    while time.time() < deadline and not all(eof(a.sock) for a in sessions):
         pass
-    assert all(closed(a.sock) for a in sessions), "revoked sessions are still open"
+    assert all(eof(a.sock) for a in sessions), "revoked sessions are still open"
     with pytest.raises(ac.AgentError, match="unknown host"):
         connect().auth(name, s)
     assert agent.request({"cmd": "screen"})["width"] > 0  # the other computer is unaffected
