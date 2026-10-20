@@ -2,7 +2,7 @@ Package: dev.scrcrappy.agent
 Name: scrcrappy-agent
 Version: 0.5.0
 Architecture: iphoneos-arm64
-Description: Lets a paired computer running scrcrappy control this iPhone over USB: touch, keys and buttons, text, clipboard, screen info and screenshots. Localhost only; a new computer needs an Allow on the phone.
+Description: Lets a paired computer running scrcrappy control this iPhone over USB: touch, keys and buttons, text, clipboard, screen info and screenshots, listing and opening apps, and opening URLs. Can keep the phone awake while connected. Localhost only; a new computer needs an Allow on the phone.
 Maintainer: scrcrappy
 Author: scrcrappy
 Section: Tweaks
