@@ -19,6 +19,9 @@ On the iPhone:
 The package depends on these, so a package manager (Sileo) pulls the first three in automatically.
 On the computer side you only need USB access (usbmuxd) and Python 3 — see Build and Install below.
 
+**Tested:** iPhone 8, iOS 16.7.1 (Dopamine). Other rootless devices and iOS 15–16 versions should
+work but aren't verified yet.
+
 ## What it does
 
 - **Touch**: taps, drags and multi-finger gestures at exact positions.
