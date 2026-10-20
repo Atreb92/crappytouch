@@ -133,6 +133,10 @@ the phone is locked.
 
 ## 3. Other open items
 
+- **Settings button: revoke all paired computers**: a button in Settings › crappytouch that forgets
+  every paired computer (deletes `hosts.plist`), so revoking doesn't need SSH. Likely a `PSButtonCell`
+  that posts a Darwin notification the tweak observes (same channel as the keep-awake switch) →
+  delete `CTStatePath("hosts.plist")`. Confirm on-device, maybe a confirm dialog before wiping.
 - **Sileo repo (later, after the agent is verified)**: static repo (`.deb` + `Packages*` from
   `dpkg-scanpackages` + `Release` from `apt-ftparchive`), e.g. on GitHub Pages; a
   `scripts/make-repo.sh` to regenerate it from the `FINALPACKAGE=1` build. Open decisions: public or
