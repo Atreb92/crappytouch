@@ -1,7 +1,7 @@
 # Review fixes: revoke UI, touch robustness, pairing hardening, pinned toolchain
 
 Date: 2026-10-20. Source: an external review of the repo (no malware found; a list of robustness and
-hardening gaps). This round covers review findings 1, 2, 3, 5, 6, 7 and concerns 3 and 4. The rest are
+hardening gaps). This round covers review findings 1, 2, 3, 6, 7 and concerns 3 and 4. The rest are
 explicitly deferred (see Non-goals).
 
 ## Intent
@@ -21,9 +21,7 @@ screen can't get stuck, and pairing prompts can't be spammed or spoofed with fak
      each is delivered as its own HID event in order. No lost taps, no up-then-down turned into a drag.
    - An `up` without `x`/`y` releases the finger at its last position instead of being dropped.
    - A computer that goes silent or stalls while a finger is held does not leave the screen pressed.
-3. **Pairing hardening** (review 5, 6, 7):
-   - After a pairing prompt ends in Deny or timeout, further `pair` requests are refused for a
-     cooldown.
+3. **Pairing hardening** (review 6, 7):
    - Computer names containing control characters (newline etc.) are rejected, so a name can't forge
      extra lines in the alert.
    - A tap on Allow that arrives after the 30 s timeout does not pair the computer.
@@ -31,7 +29,7 @@ screen can't get stuck, and pairing prompts can't be spammed or spoofed with fak
 
 ## Non-goals
 
-- Review 4 (connection-slot exhaustion before login), 8 (clipboard queue), 9 (screenshot memory),
+- Review 4 (connection-slot exhaustion before login), 5 (no cooldown after Deny; dropped by the user), 8 (clipboard queue), 9 (screenshot memory),
   10 (`CTClipboardSet` doc/thread). Deferred.
 - Concern 1/2 (fake prompts from local apps, power of a paired computer) and concern 5 (`install.sh`
   trusts the phone SSH key on first use). Accepted/documented, not changed.
@@ -95,10 +93,6 @@ All in `src/Touch.m` `CTTouch` and `src/Server.m`.
 
 All in `src/Pairing.m` and the `pair` branch of `src/Server.m`.
 
-- **Cooldown:** a static `lastRefused` timestamp set when a prompt ends in Deny or timeout;
-  `CTPair` returns `@"busy"`-style `@"denied recently"` while less than 60 s (*design call*) have
-  passed. Locked-phone refusals and successful pairings don't start the cooldown. Update
-  `PROTOCOL.md` with the new error string.
 - **Control characters:** `Server.m` rejects names with any `NSCharacterSet.controlCharacterSet`
   member (plus the existing empty / over-64 checks) with `bad host name`. One check covers the alert
   and the Revoke list, which show the same name.
@@ -120,15 +114,14 @@ All in `src/Pairing.m` and the `pair` branch of `src/Server.m`.
 
 - Rootless Dopamine/ElleKit setup, iOS 15+, arm64/arm64e (see Makefile). No private-API surface added
   beyond what the tweak already uses.
-- Protocol additions are limited to the new error string; `PROTOCOL.md` is updated with every
-  behaviour change.
+- There are no protocol additions; `PROTOCOL.md` is updated with every behaviour change (the held-finger
+  timeout).
 - `tests/` (pytest conformance and client tests) must keep passing; add cases there for the protocol
-  changes that are testable without a phone (cooldown error, control-character name, up without
-  coordinates). Touch delivery, revoke UI and the pairing race are verified on a device.
+  changes that are testable without a phone (control-character name, up without coordinates). Touch delivery, revoke UI and the pairing race are verified on a device.
 
 ## Left to the builder
 
 - Prefs-bundle layout, strings, and exact `Root.plist` shape.
 - Whether the sandbox fallback in "File access" is needed, and which one.
 - Exact timeout constants (defaults above).
-- Order of work. Suggested: pairing fixes → touch fixes → pinning → revoke (largest, needs a device).
+- Order of work. Suggested: pairing fixes (control chars, late Allow) → touch fixes → pinning → revoke (largest, needs a device).
