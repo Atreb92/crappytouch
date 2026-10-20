@@ -6,6 +6,7 @@
 #import "Clipboard.h"
 #import "Screen.h"
 #import "Apps.h"
+#import "Awake.h"
 #import <arpa/inet.h>
 #import <errno.h>
 #import <os/log.h>
@@ -143,6 +144,7 @@ static void ServeClient(int fd) {
 
     SetReadTimeout(fd, 0);
     NSMutableIndexSet *held = [NSMutableIndexSet indexSet];
+    SAAwakeConnected();
     @try {
         for (NSDictionary *msg; (msg = ReadFrame(fd, MAX_FRAME));) {
             NSString *cmd = msg[@"cmd"];
@@ -152,6 +154,7 @@ static void ServeClient(int fd) {
         }
     } @finally { // a finger left down would block the whole screen
         SATouchRelease(held);
+        SAAwakeDisconnected();
     }
 }
 

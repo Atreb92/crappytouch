@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>entry</key>
+	<dict>
+		<key>cell</key>
+		<string>PSLinkCell</string>
+		<key>label</key>
+		<string>scrcrappy-agent</string>
+		<key>icon</key>
+		<string>scrcrappyagent.png</string>
+	</dict>
+	<key>title</key>
+	<string>scrcrappy-agent</string>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>While a paired computer is connected, the iPhone doesn't auto-lock.</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>label</key>
+			<string>Keep Awake While Connected</string>
+			<key>defaults</key>
+			<string>dev.scrcrappy.agent</string>
+			<key>key</key>
+			<string>keepAwake</string>
+			<key>default</key>
+			<false/>
+			<key>PostNotification</key>
+			<string>dev.scrcrappy.agent.prefs</string>
+		</dict>
+	</array>
+</dict>
+</plist>

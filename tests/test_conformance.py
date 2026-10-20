@@ -216,3 +216,13 @@ def test_open_while_locked_says_locked(agent, request):
         pytest.skip("manual: lock the phone, then run with -m locked")
     with pytest.raises(ac.AgentError, match="locked"):
         agent.open_app("com.apple.Preferences")
+
+
+# --- keep awake while connected (Settings › scrcrappy-agent)
+
+@pytest.mark.awake
+def test_keep_awake_while_connected(agent, request):
+    if "awake" not in request.config.getoption("markexpr"):
+        pytest.skip("manual: Auto-Lock 30 s, switch on, phone unlocked, then run with -m awake")
+    time.sleep(45)  # past Auto-Lock, without touching the phone
+    agent.open_app("com.apple.Preferences")  # "locked" if the phone locked meanwhile

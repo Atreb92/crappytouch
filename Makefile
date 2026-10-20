@@ -10,7 +10,7 @@ INSTALL_TARGET_PROCESSES := SpringBoard
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME := scrcrappyagent
-scrcrappyagent_FILES := Tweak.x src/Server.m src/Auth.m src/Pairing.m src/Touch.m src/Keyboard.m src/Clipboard.m src/Screen.m src/Apps.m
+scrcrappyagent_FILES := Tweak.x src/Server.m src/Auth.m src/Pairing.m src/Touch.m src/Keyboard.m src/Clipboard.m src/Screen.m src/Apps.m src/Awake.m
 scrcrappyagent_FRAMEWORKS := Security UIKit IOKit
 scrcrappyagent_CFLAGS := -fobjc-arc
 
