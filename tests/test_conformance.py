@@ -260,3 +260,23 @@ def test_keep_awake_while_connected(agent, request):
         pytest.skip("manual: Auto-Lock 30 s, switch on, phone unlocked, then run with -m awake")
     time.sleep(45)  # past Auto-Lock, without touching the phone
     agent.open_app("com.apple.Preferences")  # "locked" if the phone locked meanwhile
+
+
+# --- revoking a computer (Settings › crappytouch › Paired Computers)
+
+def test_revoked_host_is_disconnected_and_refused(agent, secret):
+    s = secrets.token_bytes(32)
+    name = HOST + "-revoke-test"
+    print(f"\n>>> On the phone: tap ALLOW (code {ac.pairing_code(s)})")
+    connect().pair(name, s)
+    sessions = [connect(), connect()]
+    for a in sessions:
+        a.auth(name, s)
+    print(f'\n>>> On the phone: Settings > crappytouch > swipe "{name}" and tap Revoke (90 s)')
+    deadline = time.time() + 90
+    while time.time() < deadline and not all(closed(a.sock) for a in sessions):
+        pass
+    assert all(closed(a.sock) for a in sessions), "revoked sessions are still open"
+    with pytest.raises(ac.AgentError, match="unknown host"):
+        connect().auth(name, s)
+    assert agent.request({"cmd": "screen"})["width"] > 0  # the other computer is unaffected

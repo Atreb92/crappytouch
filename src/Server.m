@@ -22,6 +22,7 @@
 #define AUTH_TIMEOUT_S 10                 // ponytail: per read, not a deadline; a byte trickler keeps a slot, cap covers it
 
 static atomic_int clientCount;
+static NSMutableDictionary<NSNumber *, NSString *> *live; // fd -> host id of each authenticated session; @synchronized
 
 // `timedOut`: set when SO_RCVTIMEO fired before the first byte (a quiet connection, not a broken frame).
 static BOOL ReadExact(int fd, void *buf, size_t n, BOOL *timedOut) {
@@ -122,6 +123,7 @@ static NSDictionary *HandleCommand(NSString *cmd, NSDictionary *msg, NSMutableIn
 
 static void ServeClient(int fd) {
     NSData *nonce = CTRandomBytes(16);
+    NSString *hostID = nil;
     struct sockaddr_in local;
     socklen_t local_len = sizeof local;
     char addr[INET_ADDRSTRLEN] = "";
@@ -141,6 +143,7 @@ static void ServeClient(int fd) {
                 return;
             }
             if (!WriteFrame(fd, @{@"ok": @YES})) return;
+            hostID = msg[@"id"];
             os_log(OS_LOG_DEFAULT, "crappytouch: authenticated %{public}@",
                    [msg[@"host"] isKindOfClass:NSString.class] ? msg[@"host"] : @"?");
             break;
@@ -159,6 +162,8 @@ static void ServeClient(int fd) {
     }
 
     SetWriteTimeout(fd, SEND_TIMEOUT_S);
+    NSNumber *key = @(fd);
+    @synchronized(live) { live[key] = hostID; }
     NSMutableIndexSet *held = [NSMutableIndexSet indexSet];
     CTAwakeConnected();
     @try {
@@ -177,6 +182,7 @@ static void ServeClient(int fd) {
             if (reply && !WriteFrame(fd, reply)) return;
         }
     } @finally { // a finger left down would block the whole screen
+        @synchronized(live) { [live removeObjectForKey:key]; }
         CTTouchRelease(held);
         CTAwakeDisconnected();
     }
@@ -210,7 +216,26 @@ static void AcceptLoop(int listener) {
     }
 }
 
+// Settings removed a computer: cut the live sessions of every host that is no longer paired. shutdown() makes
+// the session thread's read fail, so its normal teardown lifts held fingers.
+static void DropRevokedSessions(void) {
+    NSMutableSet *paired = [NSMutableSet set];
+    for (NSDictionary *h in CTAuthListHosts()) [paired addObject:h[@"id"]];
+    @synchronized(live) {
+        [live enumerateKeysAndObjectsUsingBlock:^(NSNumber *fd, NSString *hostID, BOOL *stop) {
+            if (![paired containsObject:hostID]) shutdown(fd.intValue, SHUT_RDWR);
+        }];
+    }
+}
+
+static void OnRevoked(CFNotificationCenterRef c, void *o, CFNotificationName n, const void *obj, CFDictionaryRef u) {
+    DropRevokedSessions();
+}
+
 void CTServerStart(void) {
+    live = [NSMutableDictionary dictionary];
+    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, OnRevoked,
+                                    CFSTR(CT_REVOKED_NOTIFICATION), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
     int listener = socket(AF_INET, SOCK_STREAM, 0);
     int one = 1;
     setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &one, sizeof one);

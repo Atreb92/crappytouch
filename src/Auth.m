@@ -64,12 +64,34 @@ CTAuthResult CTAuthCheck(NSString *hostID, NSString *mac, NSData *nonce) {
     return CTAuthOK;
 }
 
+static BOOL WriteHosts(NSDictionary *hosts) {
+    return [hosts writeToURL:[NSURL fileURLWithPath:HostsPath()] error:NULL] &&
+           [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: @0600} ofItemAtPath:HostsPath() error:NULL];
+}
+
 BOOL CTAuthAddHost(NSString *name, NSData *secret) {
     NSMutableDictionary *hosts = [[NSDictionary dictionaryWithContentsOfFile:HostsPath()] mutableCopy]
                                  ?: [NSMutableDictionary dictionary];
     hosts[CTHex(SHA256WithPrefix(@"scrcrappy-id", secret))] =
         @{@"name": name, @"key": SHA256WithPrefix(@"scrcrappy-key", secret)};
-    NSURL *url = [NSURL fileURLWithPath:HostsPath()];
-    return [hosts writeToURL:url error:NULL] &&
-           [NSFileManager.defaultManager setAttributes:@{NSFilePosixPermissions: @0600} ofItemAtPath:HostsPath() error:NULL];
+    return WriteHosts(hosts);
+}
+
+NSArray<NSDictionary *> *CTAuthListHosts(void) {
+    NSDictionary *hosts = [NSDictionary dictionaryWithContentsOfFile:HostsPath()];
+    NSMutableArray *list = [NSMutableArray array];
+    [hosts enumerateKeysAndObjectsUsingBlock:^(id hostID, id host, BOOL *stop) {
+        NSString *name = [host isKindOfClass:NSDictionary.class] ? host[@"name"] : nil;
+        if ([hostID isKindOfClass:NSString.class])
+            [list addObject:@{@"id": hostID, @"name": [name isKindOfClass:NSString.class] ? name : @"?"}];
+    }];
+    [list sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]]];
+    return list;
+}
+
+BOOL CTAuthRemoveHost(NSString *hostID) {
+    NSMutableDictionary *hosts = [[NSDictionary dictionaryWithContentsOfFile:HostsPath()] mutableCopy];
+    if (![hostID isKindOfClass:NSString.class] || !hosts[hostID]) return NO;
+    [hosts removeObjectForKey:hostID];
+    return WriteHosts(hosts);
 }
