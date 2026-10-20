@@ -16,3 +16,21 @@ Size: 57420
 MD5sum: fc4126c790fe5f7541b03fd177737a45
 SHA256: 5f207beaa98c393260d2c2e6f9dc571f77ea609aad11bbf532e1de2576b56b10
 
+Package: com.atreb92.crappytouch
+Name: crappytouch
+Description: Lets a paired computer running scrcrappy control this iPhone over USB: touch, keys and buttons, text, clipboard, screen info and screenshots, listing and opening apps, and opening URLs. Can keep the phone awake while connected. Localhost only; a new computer needs an Allow on the phone.
+Maintainer: scrcrappy
+Author: scrcrappy
+Section: Tweaks
+Depends: mobilesubstrate | ellekit, preferenceloader
+Icon: https://atreb92.github.io/crappytouch/icon.png
+SileoDepiction: https://atreb92.github.io/crappytouch/depictions/com.atreb92.crappytouch.json
+Homepage: https://github.com/Atreb92/crappytouch
+Architecture: iphoneos-arm64
+Version: 0.6.0
+Installed-Size: 484
+Filename: debs/com.atreb92.crappytouch_0.6.0_iphoneos-arm64.deb
+Size: 67920
+MD5sum: 2e5ec97dc58aa834ec9f9a0d051a923e
+SHA256: 11f9824884d3092c55ce951ffc78fbbf5f796ed990ba852da6dbfa98680d98bf
+
