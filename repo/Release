@@ -1,0 +1,8 @@
+Origin: crappytouch
+Label: crappytouch
+Suite: stable
+Version: 1.0
+Codename: ios
+Architectures: iphoneos-arm64
+Components: main
+Description: crappytouch, the scrcrappy phone-side agent

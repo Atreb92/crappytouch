@@ -88,6 +88,12 @@ make package FINALPACKAGE=1 # release build (optimized, stripped): com.atreb92.c
 
 Both contain arm64 and arm64e.
 
+## Install from Sileo
+
+Add the source `https://atreb92.github.io/crappytouch/` in Sileo (Sources → +), then install
+**crappytouch**. Maintainers: `make package FINALPACKAGE=1 && scripts/mkrepo.sh`, commit `repo/`.
+A workflow deploys it to GitHub Pages (Settings → Pages → Source: GitHub Actions).
+
 ## Install on the phone
 
 Needs OpenSSH on the phone (Sileo). Run this **in your own terminal** — sudo on the phone asks for

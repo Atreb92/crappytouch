@@ -7,3 +7,6 @@ Maintainer: scrcrappy
 Author: scrcrappy
 Section: Tweaks
 Depends: mobilesubstrate | ellekit, preferenceloader
+Icon: https://atreb92.github.io/crappytouch/icon.png
+SileoDepiction: https://atreb92.github.io/crappytouch/depictions/com.atreb92.crappytouch.json
+Homepage: https://github.com/Atreb92/crappytouch

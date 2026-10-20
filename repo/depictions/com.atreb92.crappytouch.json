@@ -1,0 +1,10 @@
+{
+  "minVersion": "0.1",
+  "class": "DepictionStackView",
+  "tintColor": "#007aff",
+  "views": [
+    {"class": "DepictionMarkdownView", "markdown": "Lets a computer running [scrcrappy](https://github.com/Atreb92/scrcrappy) control this iPhone over USB: touch, keys and buttons, text, clipboard, screenshots, listing and opening apps, and opening URLs. Can keep the phone awake while connected.\n\nLocalhost only. A new computer needs an **Allow** on the phone.", "useRawFormat": true},
+    {"class": "DepictionTableTextView", "title": "Source", "text": "github.com/Atreb92/crappytouch"},
+    {"class": "DepictionTableTextView", "title": "Requires", "text": "Rootless jailbreak, ElleKit, PreferenceLoader"}
+  ]
+}

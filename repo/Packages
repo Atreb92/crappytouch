@@ -1,0 +1,18 @@
+Package: com.atreb92.crappytouch
+Name: crappytouch
+Description: Lets a paired computer running scrcrappy control this iPhone over USB: touch, keys and buttons, text, clipboard, screen info and screenshots, listing and opening apps, and opening URLs. Can keep the phone awake while connected. Localhost only; a new computer needs an Allow on the phone.
+Maintainer: scrcrappy
+Author: scrcrappy
+Section: Tweaks
+Depends: mobilesubstrate | ellekit, preferenceloader
+Icon: https://atreb92.github.io/crappytouch/icon.png
+SileoDepiction: https://atreb92.github.io/crappytouch/depictions/com.atreb92.crappytouch.json
+Homepage: https://github.com/Atreb92/crappytouch
+Architecture: iphoneos-arm64
+Version: 0.5.0
+Installed-Size: 276
+Filename: debs/com.atreb92.crappytouch_0.5.0_iphoneos-arm64.deb
+Size: 57420
+MD5sum: fc4126c790fe5f7541b03fd177737a45
+SHA256: 5f207beaa98c393260d2c2e6f9dc571f77ea609aad11bbf532e1de2576b56b10
+
