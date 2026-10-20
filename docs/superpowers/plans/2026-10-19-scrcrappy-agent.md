@@ -101,3 +101,23 @@
 
 - [ ] `control` (name, description, depends `mobilesubstrate | ellekit`, MIT), `README.md` (what it does / doesn't, security model, install, pairing, revoke = delete `hosts.plist`, dev loop), `PROTOCOL.md` final.
 - [ ] Commit `docs: readme and protocol`.
+
+### Task 9: List and open apps (added 2026-10-20)
+
+Spec: design Addendum "listing and opening apps".
+
+**Protocol (add to `PROTOCOL.md`):**
+- `{"cmd":"apps"}` → `{"ok":true,"apps":[{"id":"com.apple.Preferences","name":"Settings","pid":412}, …]}` — `pid` only for running apps; sorted by name.
+- `{"cmd":"open","id":"<bundle id>"}` → `{"ok":true}` | `{"error":"unknown app"}` | `{"error":"locked"}` | `{"error":"open failed"}`.
+
+**Files:** `src/Apps.{h,m}` (enumerate launchable applications and their running processes from SpringBoard; open via SpringBoard's own app-launch path), dispatch entries in the server, `client/agent_client.py` helpers `apps()` / `open_app(id)`.
+
+- [ ] Conformance first (RED): `test_apps_lists_settings` (contains `com.apple.Preferences` with a non-empty name; no duplicate ids), `test_open_unknown_app_errors`, `test_open_settings_runs_it` (after `open`, `apps` shows a pid for `com.apple.Preferences`), `test_open_while_locked_says_locked` (manual: lock the phone first; skipped unless `-m locked`).
+- [ ] Implement, GREEN on the iPhone 8; manual: Notes opens from the computer, with the phone unlocked.
+- [ ] `PROTOCOL.md` + README feature list; bump version (0.3.0); commit `feat: list and open apps`.
+
+### Task 10 (scrcrappy repo): use it
+
+- [ ] `scrcrappy agent --apps`: table `PID  Name  Identifier` like `frida-ps -Uai` (blank PID when not running); `scrcrappy agent --open <bundle id>`.
+- [ ] MCP server: tools `list_apps` and `open_app(id)`, agent mode only.
+- [ ] Tests against the existing fake agent; manual run on the phone. Commit `feat: list and open apps (agent mode)`.

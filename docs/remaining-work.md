@@ -105,6 +105,13 @@ Known limits seen from scrcrappy: `clipboard_get` and the paste behind `text` ca
 which can't be answered remotely; usbmuxd can wedge (lockdown error -8) after scrcrappy's USB reset while
 the phone is locked.
 
+## 2b. Planned: list and open apps (agent mode only, added 2026-10-20)
+
+- Agent: `apps` (like `frida-ps -Uai`: identifier, name, PID when running) and `open` by bundle
+  identifier, with errors for unknown apps and a locked phone. Plan Task 9.
+- scrcrappy: `scrcrappy agent --apps` / `--open <id>` and MCP tools `list_apps` / `open_app`.
+  Plan Task 10.
+
 ## 3. Other open items
 
 - **Sileo repo (later, after the agent is verified)**: static repo (`.deb` + `Packages*` from

@@ -93,3 +93,14 @@ Length-prefixed binary frames or newline-delimited JSON, versioned in the first 
   clipboard_set + paste or text insert, **Screenshot** button saving PNG.
 - Existing pieces to reuse: `usbmux.connect`, `geometry.to_device`, the toolbar.
 - `zxtouch.py` (written before the audit) is superseded and should be removed.
+
+## Addendum (2026-10-20): listing and opening apps (user-approved, agent mode only)
+
+- `apps`: every app that can be opened, like `frida-ps -Uai`: bundle identifier, display name, and
+  the PID when it is running. No system daemons or other non-app processes.
+- `open` with a bundle identifier: brings that app to the front, the way tapping its icon would.
+  Clear errors for an unknown identifier and for a locked phone (iOS won't open apps over the lock
+  screen). Like every other command, only after pairing and auth.
+- No new reach: a paired computer can already tap any icon; this saves hunting for it.
+- Not in Bluetooth/ESP32 mode (user decision), even though the phone's installation service could
+  list apps without the agent.
