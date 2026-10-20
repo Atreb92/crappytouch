@@ -264,6 +264,30 @@ panel's **portrait** shape (`width × scale` by `height × scale`, e.g. 750 × 1
 app's content is turned inside it: rotate the image **90° counter-clockwise** for orientation 3 and
 **90° clockwise** for 4 to show it upright (180° for 2).
 
+### apps — list the apps that can be opened
+
+```json
+{"cmd": "apps"}
+```
+
+→ `{"ok":true,"apps":[{"id":"com.apple.Preferences","name":"Settings","pid":412}, …]}`
+
+Every app SpringBoard can open (like `frida-ps -Uai`), sorted by name: bundle identifier, display
+name, and `pid` only while the app is running. No daemons or other non-app processes. A few system
+apps without a home-screen icon are included (e.g. Siri, `com.apple.webapp`).
+
+### open — bring an app to the front
+
+```json
+{"cmd": "open", "id": "com.apple.mobilenotes"}
+```
+
+→ `{"ok":true}` | `{"error":"unknown app"}` (not installed, or hidden) | `{"error":"locked"}` (iOS
+won't open apps over the lock screen; unlock first) | `{"error":"open failed"}`.
+
+Like tapping its icon: launches the app if needed. The reply comes once SpringBoard has started the
+switch, before the app has finished drawing.
+
 ### Anything else
 
 An unknown `cmd` → `{"error":"unknown command"}`; a request without a string `cmd` →

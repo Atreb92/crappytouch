@@ -108,7 +108,8 @@ the phone is locked.
 ## 2b. Planned: list and open apps (agent mode only, added 2026-10-20)
 
 - Agent: `apps` (like `frida-ps -Uai`: identifier, name, PID when running) and `open` by bundle
-  identifier, with errors for unknown apps and a locked phone. Plan Task 9.
+  identifier, with errors for unknown apps and a locked phone. Plan Task 9: **done** (0.3.0, verified
+  on the iPhone 8).
 - scrcrappy: `scrcrappy agent --apps` / `--open <id>` and MCP tools `list_apps` / `open_app`.
   Plan Task 10.
 

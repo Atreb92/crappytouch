@@ -20,8 +20,8 @@ static NSString *PairingCode(NSData *secret) {
     return [NSString stringWithFormat:@"%06u", ((uint32_t)d[0] << 16 | d[1] << 8 | d[2]) % 1000000];
 }
 
-// Main thread. Fails closed: if SpringBoard's lock manager isn't there, treat the phone as locked.
-static BOOL PhoneLocked(void) {
+// Fails closed: if SpringBoard's lock manager isn't there, treat the phone as locked.
+BOOL SAPhoneLocked(void) {
     Class mgr = NSClassFromString(@"SBLockScreenManager");
     if (![mgr respondsToSelector:@selector(sharedInstance)]) return YES;
     SBLockScreenManager *m = [mgr sharedInstance];
@@ -52,7 +52,7 @@ NSString *SAPair(NSString *name, NSData *secret) {
     dispatch_semaphore_t answered = dispatch_semaphore_create(0);
     NSString *code = PairingCode(secret);
     dispatch_sync(dispatch_get_main_queue(), ^{
-        if ((locked = PhoneLocked())) return;
+        if ((locked = SAPhoneLocked())) return;
         window = AlertWindow();
         UIAlertController *alert = [UIAlertController
             alertControllerWithTitle:[NSString stringWithFormat:@"Allow “%@” to control this iPhone?", name]

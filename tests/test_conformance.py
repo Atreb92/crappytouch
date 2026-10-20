@@ -185,3 +185,34 @@ def test_screenshot_is_png_of_screen_size(agent):  # Task 7
     expected = {(info["width"] * info["scale"], info["height"] * info["scale"]),
                 (info["height"] * info["scale"], info["width"] * info["scale"])}
     assert (w, h) in expected
+
+
+# --- Task 9: list and open apps
+
+def test_apps_lists_settings(agent):
+    apps = agent.apps()
+    ids = [a["id"] for a in apps]
+    assert len(ids) == len(set(ids))
+    settings = next(a for a in apps if a["id"] == "com.apple.Preferences")
+    assert settings["name"]
+    assert all(isinstance(a.get("pid", 1), int) for a in apps)
+
+
+def test_open_unknown_app_errors(agent):
+    with pytest.raises(ac.AgentError, match="unknown app"):
+        agent.open_app("com.example.not-installed")
+
+
+def test_open_settings_runs_it(agent):
+    agent.open_app("com.apple.Preferences")
+    time.sleep(2)
+    settings = next(a for a in agent.apps() if a["id"] == "com.apple.Preferences")
+    assert settings.get("pid", 0) > 0
+
+
+@pytest.mark.locked
+def test_open_while_locked_says_locked(agent, request):
+    if "locked" not in request.config.getoption("markexpr"):
+        pytest.skip("manual: lock the phone, then run with -m locked")
+    with pytest.raises(ac.AgentError, match="locked"):
+        agent.open_app("com.apple.Preferences")

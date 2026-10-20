@@ -12,6 +12,8 @@ Dopamine) that lets a computer running
 - **Text**: any Unicode (accents, emoji) typed into the focused field, via paste.
 - **Clipboard**: read and write the phone's clipboard text.
 - **Screen**: size, scale and orientation, and lossless PNG screenshots with the real status bar.
+- **Apps**: list the installed apps (with the PID of the running ones) and open one by bundle
+  identifier.
 
 ## What it deliberately doesn't do
 

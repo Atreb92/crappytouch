@@ -112,9 +112,9 @@ Spec: design Addendum "listing and opening apps".
 
 **Files:** `src/Apps.{h,m}` (enumerate launchable applications and their running processes from SpringBoard; open via SpringBoard's own app-launch path), dispatch entries in the server, `client/agent_client.py` helpers `apps()` / `open_app(id)`.
 
-- [ ] Conformance first (RED): `test_apps_lists_settings` (contains `com.apple.Preferences` with a non-empty name; no duplicate ids), `test_open_unknown_app_errors`, `test_open_settings_runs_it` (after `open`, `apps` shows a pid for `com.apple.Preferences`), `test_open_while_locked_says_locked` (manual: lock the phone first; skipped unless `-m locked`).
-- [ ] Implement, GREEN on the iPhone 8; manual: Notes opens from the computer, with the phone unlocked.
-- [ ] `PROTOCOL.md` + README feature list; bump version (0.3.0); commit `feat: list and open apps`.
+- [x] Conformance first (RED): `test_apps_lists_settings` (contains `com.apple.Preferences` with a non-empty name; no duplicate ids), `test_open_unknown_app_errors`, `test_open_settings_runs_it` (after `open`, `apps` shows a pid for `com.apple.Preferences`), `test_open_while_locked_says_locked` (manual: lock the phone first; skipped unless `-m locked`).
+- [x] Implement, GREEN on the iPhone 8; manual: Notes opens from the computer, with the phone unlocked.
+- [x] `PROTOCOL.md` + README feature list; bump version (0.3.0); commit `feat: list and open apps`.
 
 ### Task 10 (scrcrappy repo): use it
 

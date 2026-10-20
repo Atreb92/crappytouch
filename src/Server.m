@@ -5,6 +5,7 @@
 #import "Keyboard.h"
 #import "Clipboard.h"
 #import "Screen.h"
+#import "Apps.h"
 #import <arpa/inet.h>
 #import <errno.h>
 #import <os/log.h>
@@ -93,6 +94,12 @@ static NSDictionary *HandleCommand(NSString *cmd, NSDictionary *msg, NSMutableIn
     if ([cmd isEqual:@"screenshot"]) {
         NSData *png = SAScreenshotPNG();
         return png ? @{@"ok": @YES, @"png": [png base64EncodedStringWithOptions:0]} : @{@"error": @"screenshot failed"};
+    }
+    if ([cmd isEqual:@"apps"]) return @{@"ok": @YES, @"apps": SAApps()};
+    if ([cmd isEqual:@"open"]) {
+        NSString *bundleID = msg[@"id"];
+        NSString *error = [bundleID isKindOfClass:NSString.class] ? SAOpenApp(bundleID) : @"unknown app";
+        return error ? @{@"error": error} : @{@"ok": @YES};
     }
     return @{@"error": @"unknown command"};
 }
