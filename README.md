@@ -95,7 +95,5 @@ MIT, see [LICENSE](LICENSE).
 
 ## Credits
 
-- [scrcrappy](https://github.com/Atreb92/scrcrappy): the computer-side companion that drives
-  crappytouch over USB; the Settings icon is rendered from its app icon.
 - ZXTouch: showed how touches can be injected from SpringBoard on a jailbroken iPhone. crappytouch
   follows the same approach as a clean rewrite and contains none of its code.
